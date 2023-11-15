@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "pid_dl"
+version = "0.1.0"
+description = ""
+authors = ["MoonshotsLaptop <gamoonshots@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+numpy = "^1.26.1"
+tqdm = "^4.66.1"
+ijson = "^3.2.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
