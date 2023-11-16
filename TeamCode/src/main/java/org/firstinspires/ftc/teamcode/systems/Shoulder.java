@@ -71,12 +71,18 @@ public class Shoulder {
     }
 
     public void goToPickUp() {
+        // ongoing motion check... should it continue moving?
         if(motor.getCurrentPosition() + offset <= DOWN_POSITION)
             motor.setPower(MOTOR_STRENGTH);
-        rollServo.setPosition(ROLL_MAX);
-        rollPos = ROLL_MAX;
-        wristServo.setPosition(WRIST_MIN);
-        wristAng = WRIST_MIN;
+        // Encoder values go down as arm goes up
+        // -1400 + x >= -400
+        // offset corrects encorder "walk"
+        if(motor.getCurrentPosition() + offset >= -1350){
+            rollServo.setPosition(ROLL_MAX);
+            rollPos = ROLL_MAX;
+            wristServo.setPosition(WRIST_MIN);
+            wristAng = WRIST_MIN;
+        }
         open();
     }
 
@@ -84,10 +90,13 @@ public class Shoulder {
         close();
         if(motor.getCurrentPosition() + offset >= UP_POSITION)
             motor.setPower(-MOTOR_STRENGTH);
-        rollServo.setPosition(ROLL_MIN);
-        rollPos = ROLL_MIN;
-        wristServo.setPosition(WRIST_ON_WALL);
-        wristAng = WRIST_ON_WALL;
+        // Encoder values go down as arm goes up
+        if(motor.getCurrentPosition() + offset <= -400){
+            rollServo.setPosition(ROLL_MIN);
+            rollPos = ROLL_MIN;
+            wristServo.setPosition(WRIST_ON_WALL);
+            wristAng = WRIST_ON_WALL;
+        }
     }
 
     public void wristUp() {

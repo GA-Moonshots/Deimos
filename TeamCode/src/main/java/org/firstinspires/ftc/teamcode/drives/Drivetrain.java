@@ -51,7 +51,8 @@ public abstract class Drivetrain {
         return isFieldCentric;
     }
 
-
+    private double lastAprilTagYaw = 0.0d;
+    private double lastAprilTagStrafe = 0.0d;
 
     public enum AprilTagToAlign {
         LEFT,
@@ -125,12 +126,125 @@ public abstract class Drivetrain {
         stop();
     }
 
+    public void squareUp() {
+        double ang = Math.abs(imu.getZAngle());
+        double targetAng = 0;
+        // find target angle
+        if( ang % 90 >= 45)
+            targetAng = ang + (90 - (ang % 90));
+        else
+            targetAng = ang - (ang % 90);
+        //turn to angle
+        telemetry.addData("targetAngFound", targetAng);
+
+        turnRobotToAngle(targetAng);
+
+
+    }
+
+    public boolean alignToAprilTag(AprilTagToAlign alignment) {
+        if(telemetry != null) {
+            switch (alignment) {
+                case LEFT: telemetry.addData("Aligning To", "Left"); break;
+                case CENTER: telemetry.addData("Aligning To", "Center"); break;
+                case RIGHT: telemetry.addData("Aligning To", "Right"); break;
+            }
+        }
+
+        List<AprilTagDetection> detections = camera.getDetections();
+
+        // Ensure that there is at least one detection
+        if(detections.size() == 0) {
+            if(telemetry != null)
+                telemetry.addData("Detections", "Did not find a tag");
+            // Use the last stored values
+            drive(0.0d,
+                    Range.clip((-lastAprilTagStrafe) / APRIL_TAG_PRECISION, -APRIL_TAG_MAX_SPEED, APRIL_TAG_MAX_SPEED),
+                    0.0d
+            );
+            return lastAprilTagStrafe <= Constants.INPUT_THRESHOLD;
+        }
+        AprilTagDetection activeDetection = null;
+
+        // check turning before everything else, since the detections.size() == 0 check will ensure it stays in line
+        // Any detection will work for this part
+        if(detections.get(0).ftcPose.yaw <= Constants.ANGLE_THRESHOLD) {
+            drive(0.0d, 0.0d,
+                    Range.clip(-Math.toRadians(detections.get(0).ftcPose.yaw), -MOTOR_MAX_SPEED, MOTOR_MAX_SPEED)
+            );
+            // Every time we have an april tag we should set this to ensure we remember where we are
+            lastAprilTagStrafe = activeDetection.ftcPose.x;
+            lastAprilTagYaw = activeDetection.ftcPose.yaw;
+            return true;
+        }
+        // We have now ensured we are at the correct angle
+
+        // Find case for if we have the correct detection
+        for(AprilTagDetection detection : detections) {
+            if(detection.metadata != null)
+                switch (alignment) {
+                    case LEFT:
+                        if (detection.metadata.name.toLowerCase().contains("left")) {
+                            activeDetection = detection;
+                        }
+                        break;
+                    case CENTER:
+                        if (detection.metadata.name.toLowerCase().contains("center")) {
+                            activeDetection = detection;
+                        }
+                        break;
+                    case RIGHT:
+                        if (detection.metadata.name.toLowerCase().contains("right")) {
+                            activeDetection = detection;
+                        }
+                        break;
+                }
+        }
+
+        // if previous case does not find correct tag
+        if(activeDetection == null) {
+            if(telemetry != null)
+                telemetry.addData("Detections", "Found wrong tag");
+            activeDetection = detections.get(0);
+            switch (alignment) {
+                case LEFT:
+                    drive(0,APRIL_TAG_MAX_SPEED, 0);
+                    break;
+
+                case RIGHT:
+                    drive(0, -APRIL_TAG_MAX_SPEED, 0 );
+                    break;
+
+                case CENTER:
+                    if(activeDetection.metadata.name.toLowerCase().contains("left"))
+                        drive(0,-APRIL_TAG_MAX_SPEED, 0);
+
+                    else
+                        drive(0, APRIL_TAG_MAX_SPEED, 0);
+                    break;
+            }
+            // Every time we have an april tag we should set this to ensure we remember where we are
+            lastAprilTagStrafe = activeDetection.ftcPose.x;
+            lastAprilTagYaw = activeDetection.ftcPose.yaw;
+
+            return true;
+        }
+
+        // We have now ensured that activeDetection represents the tag we are looking for
+        if(telemetry != null)
+            telemetry.addData("Detections", "Found correct tag");
+        stop();
+        // Every time we have an april tag we should set this to ensure we remember where we are
+        lastAprilTagStrafe = activeDetection.ftcPose.x;
+        lastAprilTagYaw = activeDetection.ftcPose.yaw;
+        return true;
+    }
     /**
      *
      * @param alignment the AprilTagToAlign
      * @return true if this method can be called again without adjustment
      */
-    public boolean alignToAprilTag(AprilTagToAlign alignment) {
+    public boolean rememberThis(AprilTagToAlign alignment) {
         switch (alignment) {
             case LEFT: telemetry.addData("Aligning To", "Left"); break;
             case CENTER: telemetry.addData("Aligning To", "Center"); break;

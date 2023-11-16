@@ -14,10 +14,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class MecanumDrive extends Drivetrain {
-    private DcMotor leftFront;
-    private DcMotor rightFront;
-    private DcMotor leftBack;
-    private DcMotor rightBack;
+    private final DcMotor leftFront;
+    private final DcMotor rightFront;
+    private final DcMotor leftBack;
+    private final DcMotor rightBack;
 
     private double fieldCentricTarget = 0.0d;
 
@@ -118,6 +118,44 @@ public class MecanumDrive extends Drivetrain {
 
     @Override
     public void turnRobotToAngle(double target) {
+        // NOTE: Negative return values will increase the gyro's value
+        boolean wasFieldCentric = isFieldCentric;
+        isFieldCentric = false;
+
+        int ENOUGH_CHECKS = 15; // how many times do we pass our target until we're satisfied?
+        int check = 0;
+        // determine the error
+        double error = 0; // target - drive.gyro.getAngle();
+        //TODO note time and cut off at like 3 seconds
+        while(ENOUGH_CHECKS > check) {
+            // determine the power output neutral of direction
+            double output = Math.abs(error / target) * MOTOR_MAX_SPEED;
+            if (output > MOTOR_MAX_SPEED) output = MOTOR_MAX_SPEED;
+
+            // determine the direction
+            // if I was trying to go a positive angle change from the start
+            if (target > 0) {
+                if (error > 0)
+                    drive(0, 0, -output);
+                else
+                    drive(0, 0, output);
+            }
+            // if I was trying to go a negative angle from the start
+            else{
+                if (error < 0)
+                    drive(0, 0, output);
+                else
+                    drive(0, 0, -output);
+            }
+            // ARE WE THERE YET?
+            if (Math.abs(error) < 2) check++;
+
+        } // end while loop
+
+        // shut down motors
+        stop();
+        // restore previous fieldCentric state
+        isFieldCentric = wasFieldCentric;
 
     }
 }

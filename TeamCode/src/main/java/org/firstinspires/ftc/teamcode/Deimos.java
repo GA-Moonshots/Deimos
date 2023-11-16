@@ -45,6 +45,7 @@ public class Deimos extends LinearOpMode {
 
         // Init Loop (runs until stop button or start button is pressed)
         while(opModeInInit()) {
+
             telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
             telemetry.addData("G2LS", "(%f, %f)", gamepad2.left_stick_x, gamepad2.left_stick_y);
@@ -59,9 +60,11 @@ public class Deimos extends LinearOpMode {
 
         // Main (runs until stop is pressed)
         while(opModeIsActive()) {
+
             telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
             telemetry.addData("UPS", 1 / (timeyMcTimeTimerTimerson.seconds() - lastTime));
+            telemetry.addData("zAngle", driveyMcDriveDriveDriverson.getIMU().getZAngle());
             lastTime = timeyMcTimeTimerTimerson.seconds();
             //
             // Driver 1: Responsible for drivetrain and movement
@@ -83,12 +86,14 @@ public class Deimos extends LinearOpMode {
     private void driver1Inputs() {
         // Toggle field-centric mode
         boolean aDown = gamepad1.a && !gp1aPressed && !gamepad1.start;
+        boolean xPressed = gamepad1.x;
 
         // ---DETERMINE IF WE'RE ALIGNING TO AN APRIL TAG----
         boolean dpadUpPressed = (gamepad1.dpad_up && !gamepad1.dpad_down);
         boolean dpadDownPressed = (gamepad1.dpad_down && !gamepad1.dpad_up);
         boolean dpadLeftPressed = (gamepad1.dpad_left && !gamepad1.dpad_right);
         boolean dpadRightPressed = (gamepad1.dpad_right && !gamepad1.dpad_left);
+
         if(dpadLeftPressed && !(dpadUpPressed || dpadDownPressed || dpadRightPressed)) {
             align = Drivetrain.AprilTagToAlign.LEFT;
         } else if(dpadRightPressed && !(dpadUpPressed || dpadDownPressed || dpadLeftPressed)) {
@@ -98,6 +103,9 @@ public class Deimos extends LinearOpMode {
         } else if(dpadDownPressed && !(dpadUpPressed || dpadLeftPressed || dpadRightPressed)) {
             align = Drivetrain.AprilTagToAlign.NONE;
         }
+
+        if (xPressed) driveyMcDriveDriveDriverson.squareUp();
+
 
         // is the pilot denied control of the robot while we line up to an April tag?
         if(align != Drivetrain.AprilTagToAlign.NONE) {
