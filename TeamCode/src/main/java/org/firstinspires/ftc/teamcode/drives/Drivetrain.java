@@ -142,7 +142,7 @@ public abstract class Drivetrain {
 
     }
 
-    public boolean alignToAprilTag(AprilTagToAlign alignment) {
+    public boolean alignToAprilTag_rework(AprilTagToAlign alignment) {
         if(telemetry != null) {
             switch (alignment) {
                 case LEFT: telemetry.addData("Aligning To", "Left"); break;
@@ -244,7 +244,7 @@ public abstract class Drivetrain {
      * @param alignment the AprilTagToAlign
      * @return true if this method can be called again without adjustment
      */
-    public boolean rememberThis(AprilTagToAlign alignment) {
+    public boolean alignToAprilTag(AprilTagToAlign alignment) {
         switch (alignment) {
             case LEFT: telemetry.addData("Aligning To", "Left"); break;
             case CENTER: telemetry.addData("Aligning To", "Center"); break;

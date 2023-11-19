@@ -13,6 +13,8 @@ public class RightDummy extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, null);
 
+        drive.toggleFieldCentric();
+
         waitForStart();
         if(opModeIsActive())
             drive.drive(0.0, 0.3, 0.0);

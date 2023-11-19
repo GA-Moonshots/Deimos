@@ -47,16 +47,6 @@ public class LeftBlueAuto extends LinearOpMode {
 
         camera = new Camera(hardwareMap, telemetry);
 
-        //makes arm not slam on the ground on start of autonomous
-        ElapsedTime rt = new ElapsedTime();
-        shoulder.move(0.1);
-
-        while(opModeInInit() && rt.seconds() <= 3) {
-            wait();
-        }
-
-        shoulder.move(0);
-
         waitForStart();
 
         while(rearDistance.getDistance(DistanceUnit.INCH) <= 18 && opModeIsActive()) {
