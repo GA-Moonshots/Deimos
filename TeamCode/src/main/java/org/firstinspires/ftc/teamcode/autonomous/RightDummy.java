@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drives.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Shoulder;
@@ -16,10 +17,11 @@ public class RightDummy extends LinearOpMode {
         drive.toggleFieldCentric();
 
         waitForStart();
+        ElapsedTime rt = new ElapsedTime();
         if(opModeIsActive())
             drive.drive(0.0, 0.3, 0.0);
-        while(opModeIsActive())
-            wait();
+        while(opModeIsActive() && rt.seconds() <= 5)
+            sleep(1);
 
         drive.stop();
     }

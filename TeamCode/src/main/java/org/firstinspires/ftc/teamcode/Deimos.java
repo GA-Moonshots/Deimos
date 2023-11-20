@@ -115,6 +115,7 @@ public class Deimos extends LinearOpMode {
         // listen to driver controls
         } else {
             telemetry.addData("Drive", "Listening to LSX, LSY, RSX");
+            double speedMod = gamepad1.left_bumper ? 0.5 : 1;
             double forward = gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double turn = gamepad1.right_stick_x;
@@ -158,7 +159,7 @@ public class Deimos extends LinearOpMode {
         else {
             shoulderMcShoulderShoulderson.move(shoulderRotate);
             if(gamepad2.a && !gp2aPressed && !gamepad2.start){
-                shoulderMcShoulderShoulderson.toggleRoll();
+                shoulderMcShoulderShoulderson.travelMode();
             }
 
             if(gamepad2.dpad_up && !gamepad2.dpad_down) {

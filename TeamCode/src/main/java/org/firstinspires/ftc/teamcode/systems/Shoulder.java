@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.util.Locale;
+
 public class Shoulder {
     // CONSTANTS
     public static final int UP_POSITION = -1400;
@@ -22,12 +24,13 @@ public class Shoulder {
 
     public static final double WRIST_INC = 0.01;
     public static final double WRIST_MAX = 0.8;
-    public static final double WRIST_MIN = 0.36;
+    public static final double WRIST_ON_GROUND = 0.36;
 
-    public static final double ROLL_MAX = 0.75;
+    public static final double WRIST_MIN = 0.0;
+
+    public static final double ROLL_MAX = 0.72;
     public static final double ROLL_MIN = 0;
     public static final double ROLL_INC = 0.03;
-    public static final double SHOULDER_HEIGHT = 27.305;
 
     // STATE VARIABLES
     private double wristAng = WRIST_MIN;
@@ -36,12 +39,12 @@ public class Shoulder {
     private int offset = 0;
 
     // SUBSYSTEM ASSETS
-    private Servo wristServo;
-    private Servo openServo;
-    private Servo rollServo;
+    private final Servo wristServo;
+    private final Servo openServo;
+    private final Servo rollServo;
 
-    private Telemetry telemetry;
-    private DcMotor motor;
+    private final Telemetry telemetry;
+    private final DcMotor motor;
 
 
     public Shoulder(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -76,7 +79,7 @@ public class Shoulder {
             motor.setPower(MOTOR_STRENGTH);
         // Encoder values go down as arm goes up
         // -1400 + x >= -400
-        // offset corrects encorder "walk"
+        // offset corrects encoder "walk"
         if(motor.getCurrentPosition() + offset >= -1350){
             rollServo.setPosition(ROLL_MAX);
             rollPos = ROLL_MAX;
@@ -99,6 +102,12 @@ public class Shoulder {
         }
     }
 
+    public void travelMode() {
+        close();
+        wristServo.setPosition(0);
+        wristAng = 0;
+    }
+
     public void wristUp() {
         wristAng -= WRIST_INC;
         if (wristAng <= WRIST_MIN) {
@@ -117,10 +126,6 @@ public class Shoulder {
         wristAng += WRIST_INC;
         wristAng = Range.clip(wristAng, WRIST_MIN, WRIST_MAX);
         wristServo.setPosition(wristAng);
-
-        //fail safe for hitting ground
-        double shoulderAngle = 0.01 * motor.getCurrentPosition() - offset;
-        //double armLength =
     }
 
     public void open() {
@@ -169,7 +174,7 @@ public class Shoulder {
     @NonNull
     @Override
     public String toString() {
-        return String.format("OPR: (%f, %f, %f)", openServo.getPosition(), wristServo.getPosition(), rollServo.getPosition());
+        return String.format(Locale.ENGLISH, "OPR: (%f, %f, %f)", openServo.getPosition(), wristServo.getPosition(), rollServo.getPosition());
     }
 
     public void changeOffset(int delta) {

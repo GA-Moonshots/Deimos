@@ -47,6 +47,7 @@ public class MecanumDrive extends Drivetrain {
 
     @Override
     public void drive(double forward, double strafe, double turn) {
+
         // Field Centric adjustment
         if (isFieldCentric) {
             // Learn more:
@@ -55,8 +56,9 @@ public class MecanumDrive extends Drivetrain {
             double temp = forward;
             forward = forward * Math.cos(Math.toRadians(diff)) - strafe * Math.sin(Math.toRadians(diff));
             strafe = temp * Math.sin(Math.toRadians(diff)) + strafe * Math.cos(Math.toRadians(diff));
-            telemetry.addData("Mode", "Field Centric");
-        } else
+            if(telemetry != null)
+                telemetry.addData("Mode", "Field Centric");
+        } else if(telemetry != null)
             telemetry.addData("Mode", "Robot Centric");
 
         isGyroLocked = turn <= Constants.INPUT_THRESHOLD;
