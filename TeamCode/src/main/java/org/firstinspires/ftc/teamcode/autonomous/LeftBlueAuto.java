@@ -3,13 +3,12 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drives.MecanumDrive;
 import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
-import org.firstinspires.ftc.teamcode.systems.Shoulder;
+import org.firstinspires.ftc.teamcode.systems.Arm;
 import org.firstinspires.ftc.teamcode.vision.Camera;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -19,15 +18,7 @@ import java.util.List;
 public class LeftBlueAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;
-    private Shoulder shoulder;
-
-    // SENSORS
-    private DistanceSensor rearDistance;
-    private DistanceSensor leftDistance;
-    private DistanceSensor rightDistance;
-
-    // SUBSYSTEMS THAT ARE JUST SENSORS
-    private Camera camera;
+    private Arm arm;
 
     private enum TargetPosition {
         LEFT,
@@ -39,26 +30,20 @@ public class LeftBlueAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new MecanumDrive(hardwareMap, null);
-        shoulder = new Shoulder(hardwareMap, null);
-
-        rearDistance = new DistanceSensor(hardwareMap, "rear");
-        leftDistance = new DistanceSensor(hardwareMap, "left");
-        rightDistance = new DistanceSensor(hardwareMap, "right");
-
-        camera = new Camera(hardwareMap, telemetry);
+        arm = new Arm(hardwareMap, null);
 
         waitForStart();
 
-        while(rearDistance.getDistance(DistanceUnit.INCH) <= 18 && opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
+        while(drive.rearDistance.getDistance(DistanceUnit.INCH) <= 18 && opModeIsActive()) {
+            telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
             telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
             telemetry.update();
             drive.drive(-0.3, 0.0, 0.0);
         }
         drive.stop();
 
-        while(rearDistance.getDistance(DistanceUnit.INCH) >= 8 && opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
+        while(drive.rearDistance.getDistance(DistanceUnit.INCH) >= 8 && opModeIsActive()) {
+            telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
             telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
             telemetry.update();
             drive.drive(0.0, 0.0, 0.3);
@@ -71,7 +56,7 @@ public class LeftBlueAuto extends LinearOpMode {
         }
 
         while(Math.abs(targetAngle - drive.getIMU().getZAngle()) >= 1 && opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
+            telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
             telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
             telemetry.addData("Target", targetAngle);
             telemetry.update();
@@ -79,31 +64,31 @@ public class LeftBlueAuto extends LinearOpMode {
         }
         drive.stop();
 
-        shoulder.open();
-        shoulder.wristTo(0.5);
+        arm.open();
+        arm.wristTo(0.5);
 
         sleep(3000);
 
-        shoulder.close();
-        shoulder.wristTo(1.0);
+        arm.close();
+        arm.wristTo(1.0);
 
         while(Math.abs(drive.getIMU().getZAngle()) >= 1 && opModeIsActive()) {
             drive.drive(0.0, 0.0, Math.toRadians(drive.getIMU().getZAngle()));
         }
         drive.stop();
 
-        while((rearDistance.getDistance() >= 6 || leftDistance.getDistance() >= 24) && opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance());
-            telemetry.addData("Rear Distance", leftDistance.getDistance());
+        while((drive.rearDistance.getDistance() >= 6 || drive.leftDistance.getDistance() >= 24) && opModeIsActive()) {
+            telemetry.addData("Rear Distance", drive.rearDistance.getDistance());
+            telemetry.addData("Rear Distance", drive.leftDistance.getDistance());
             telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.addData("Inputs", "(%.2f, %.2f, %.2f)", (rearDistance.getDistance() - 6),
-                    -(leftDistance.getDistance() - 24),
+            telemetry.addData("Inputs", "(%.2f, %.2f, %.2f)", (drive.rearDistance.getDistance() - 6),
+                    -(drive.leftDistance.getDistance() - 24),
                     Math.toRadians(drive.getIMU().getZAngle()));
             telemetry.update();
 
             drive.drive(
-                    Range.clip((rearDistance.getDistance() - 6), -1, 1) / 4,
-                    Range.clip((-(leftDistance.getDistance() - 24)), -1, 1) / 4,
+                    Range.clip((drive.rearDistance.getDistance() - 6), -1, 1) / 4,
+                    Range.clip((-(drive.leftDistance.getDistance() - 24)), -1, 1) / 4,
                     Math.toRadians(drive.getIMU().getZAngle()));
         }
         drive.stop();
@@ -115,7 +100,7 @@ public class LeftBlueAuto extends LinearOpMode {
         drive.toggleFieldCentric();
         drive.stop();
 
-        while(camera.getDetections().size() == 0 && opModeIsActive()) {
+        while(drive.camera.getDetections().size() == 0 && opModeIsActive()) {
             drive.drive(-0.2, 0.0, 0.0);
         }
         drive.stop();
@@ -131,7 +116,7 @@ public class LeftBlueAuto extends LinearOpMode {
         }
 
         while(opModeIsActive()) {
-            List<AprilTagDetection> detections = camera.getDetections();
+            List<AprilTagDetection> detections = drive.camera.getDetections();
             AprilTagDetection activeDetection = null;
             for(AprilTagDetection detection : detections) {
                 switch(targetPosition) {
@@ -165,29 +150,17 @@ public class LeftBlueAuto extends LinearOpMode {
             // PX, PY, AZ
         }
 
-        while(opModeIsActive() && rearDistance.getDistance() >= 8) {
+        while(opModeIsActive() && drive.rearDistance.getDistance() >= 8) {
             drive.drive(0.0, -0.15, 0.0);
         }
 
-        while(opModeIsActive() && rightDistance.getDistance() <= 42) {
+        while(opModeIsActive() && drive.rightDistance.getDistance() <= 42) {
             drive.drive(-1.0, 0.0, 0.0);
         }
 
-        while(opModeIsActive() && rearDistance.getDistance() >= 1) {
+        while(opModeIsActive() && drive.rearDistance.getDistance() >= 1) {
             drive.drive(0.0, -0.2, 0.0);
         }
-        /*
-        PIDController thetaController = new PIDController(telemetry, "theta");
-        double turnStrength = thetaController.getPIDControlledValue(Math.toRadians(drive.getIMU().getZAngle()), targetAngle);
 
-        while(turnStrength >= Constants.INPUT_THRESHOLD && opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
-            telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.update();
-            drive.drive(0.0d, 0.0d, turnStrength);
-            turnStrength = thetaController.getPIDControlledValue(Math.toRadians(drive.getIMU().getZAngle()), targetAngle);
-        }
-
-         */
     }
 }

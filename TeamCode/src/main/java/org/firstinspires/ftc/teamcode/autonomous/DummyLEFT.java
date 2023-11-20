@@ -4,14 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drives.MecanumDrive;
-import org.firstinspires.ftc.teamcode.systems.Shoulder;
+import org.firstinspires.ftc.teamcode.systems.Arm;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Left Dummy")
-public class LeftDummy extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Dummy LEFT")
+public class DummyLEFT extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Shoulder shoulder = new Shoulder(hardwareMap, null);
-
         MecanumDrive drive = new MecanumDrive(hardwareMap, null);
 
         waitForStart();

@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.Locale;
 
-public class Shoulder {
+public class Arm {
     // CONSTANTS
     public static final int UP_POSITION = -1400;
     public static final int DOWN_POSITION = 0;
@@ -47,7 +47,7 @@ public class Shoulder {
     private final DcMotor motor;
 
 
-    public Shoulder(HardwareMap hardwareMap, Telemetry telemetry) {
+    public Arm(HardwareMap hardwareMap, Telemetry telemetry) {
         this.motor = hardwareMap.get(DcMotor.class, "arm");
         this.telemetry = telemetry;
         this.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

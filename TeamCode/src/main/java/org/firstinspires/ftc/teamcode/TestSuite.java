@@ -5,10 +5,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.drives.MecanumDrive;
-import org.firstinspires.ftc.teamcode.systems.CascadeArm;
-import org.firstinspires.ftc.teamcode.systems.Shoulder;
+import org.firstinspires.ftc.teamcode.systems.Arm;
 import org.firstinspires.ftc.teamcode.wrappers.PIDController;
 
 import java.io.IOException;
@@ -53,7 +51,7 @@ public class TestSuite extends LinearOpMode {
     }
 
     private void armTest() {
-        Shoulder shoulder = new Shoulder(hardwareMap, telemetry);
+        Arm arm = new Arm(hardwareMap, telemetry);
 
     }
 

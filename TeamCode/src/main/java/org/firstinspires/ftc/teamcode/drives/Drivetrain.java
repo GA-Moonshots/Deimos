@@ -12,7 +12,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import java.util.List;
 
 public abstract class Drivetrain {
-    // Drivetrain constants
+    // CONSTANTS
     public static final double ANGLE_TOLERANCE = 1.5; // The angle, in degrees, that is considered "close enough"
     public static final double DISTANCE_TOLERANCE = 1.0; // The distance, in centimeters, that is considered "close enough"
     public static final double MOTOR_MAX_SPEED = 0.9;
@@ -23,7 +23,7 @@ public abstract class Drivetrain {
     public static final double APRIL_TAG_PRECISION = 10;
     public static final double APRIL_TAG_MAX_SPEED = 0.3;
 
-    // Drivetrain instance-specific variables
+    // INSTANCE VARIABLES
     protected boolean isFieldCentric = true;
     protected Telemetry telemetry;
     protected IMU imu;

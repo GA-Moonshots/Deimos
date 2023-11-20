@@ -12,15 +12,23 @@ import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
+import org.firstinspires.ftc.teamcode.vision.Camera;
 
 public class MecanumDrive extends Drivetrain {
+    // MOTORS
     private final DcMotor leftFront;
     private final DcMotor rightFront;
     private final DcMotor leftBack;
     private final DcMotor rightBack;
+    // SENSORS
+    public DistanceSensor rearDistance;
+    public DistanceSensor leftDistance;
+    public DistanceSensor rightDistance;
+    public Camera camera;
 
+    // INSTANCE VARIABLES
     private double fieldCentricTarget = 0.0d;
-
     private boolean isGyroLocked = false;
     private boolean isTargetSet = false;
     private double gyroTarget = 0.0d;
@@ -41,6 +49,10 @@ public class MecanumDrive extends Drivetrain {
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rearDistance = new DistanceSensor(hardwareMap, "rear");
+        leftDistance = new DistanceSensor(hardwareMap, "left");
+        rightDistance = new DistanceSensor(hardwareMap, "right");
+        camera = new Camera(hardwareMap, telemetry);
 
         fieldCentricTarget = imu.getZAngle();
     }
@@ -101,7 +113,7 @@ public class MecanumDrive extends Drivetrain {
         if(telemetry != null)
             telemetry.addData("Motors", "(%.2f, %.2f, %.2f, %.2f)",
                     leftFrontPower, leftBackPower, rightBackPower, rightFrontPower);
-//;
+
         drive(
                 leftFrontPower,
                 rightFrontPower,
