@@ -33,7 +33,7 @@ public class Arm {
     public static final double ROLL_INC = 0.03;
 
     // STATE VARIABLES
-    private double wristAng = WRIST_MIN;
+    private double wristAng = WRIST_ON_GROUND;
     private double rollPos = ROLL_MAX;
     private boolean isOpen = false;
     private int offset = 0;
@@ -56,7 +56,7 @@ public class Arm {
         openServo = hardwareMap.get(Servo.class, "open");
         rollServo = hardwareMap.get(Servo.class, "roll");
         wristServo.setPosition(wristAng);
-        openServo.setPosition(1);
+        openServo.setPosition(CLOSED_POS);
         rollServo.setPosition(rollPos);
     }
 
@@ -83,8 +83,8 @@ public class Arm {
         if(motor.getCurrentPosition() + offset >= -1350){
             rollServo.setPosition(ROLL_MAX);
             rollPos = ROLL_MAX;
-            wristServo.setPosition(WRIST_MIN);
-            wristAng = WRIST_MIN;
+            wristServo.setPosition(WRIST_ON_GROUND);
+            wristAng = WRIST_ON_GROUND;
         }
         open();
     }

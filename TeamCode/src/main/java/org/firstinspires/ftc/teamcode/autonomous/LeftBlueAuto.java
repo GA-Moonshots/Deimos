@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -34,7 +35,7 @@ public class LeftBlueAuto extends LinearOpMode {
 
         waitForStart();
 
-        while(drive.rearDistance.getDistance(DistanceUnit.INCH) <= 18 && opModeIsActive()) {
+        while(drive.rearDistance.getDistance(DistanceUnit.INCH) <= 20 && opModeIsActive()) {
             telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
             telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
             telemetry.update();
@@ -64,13 +65,25 @@ public class LeftBlueAuto extends LinearOpMode {
         }
         drive.stop();
 
-        arm.open();
-        arm.wristTo(0.5);
+        drive.toggleFieldCentric();
+        ElapsedTime rt = new ElapsedTime();
+        while(rt.seconds() < 0.5 && opModeIsActive())
+            drive.drive(-0.2, 0.0, 0.0);
+        drive.stop();
+        sleep(100);
 
-        sleep(3000);
+        arm.goToPickUp();
+
+        sleep(1000);
 
         arm.close();
-        arm.wristTo(1.0);
+        arm.travelMode();
+
+        rt.reset();
+        while(rt.seconds() < 0.5 && opModeIsActive())
+            drive.drive(0.2, 0.0, 0.0);
+        drive.stop();
+        drive.toggleFieldCentric();
 
         while(Math.abs(drive.getIMU().getZAngle()) >= 1 && opModeIsActive()) {
             drive.drive(0.0, 0.0, Math.toRadians(drive.getIMU().getZAngle()));
@@ -92,6 +105,7 @@ public class LeftBlueAuto extends LinearOpMode {
                     Math.toRadians(drive.getIMU().getZAngle()));
         }
         drive.stop();
+        /*
         sleep(100);
         drive.toggleFieldCentric();
         while(Math.abs(drive.getIMU().getZAngle() + 90) >= 1 && opModeIsActive()) {
@@ -161,6 +175,8 @@ public class LeftBlueAuto extends LinearOpMode {
         while(opModeIsActive() && drive.rearDistance.getDistance() >= 1) {
             drive.drive(0.0, -0.2, 0.0);
         }
+
+         */
 
     }
 }

@@ -52,7 +52,7 @@ public class MecanumDrive extends Drivetrain {
         rearDistance = new DistanceSensor(hardwareMap, "rear");
         leftDistance = new DistanceSensor(hardwareMap, "left");
         rightDistance = new DistanceSensor(hardwareMap, "right");
-        camera = new Camera(hardwareMap, telemetry);
+        this.camera = null;
 
         fieldCentricTarget = imu.getZAngle();
     }
