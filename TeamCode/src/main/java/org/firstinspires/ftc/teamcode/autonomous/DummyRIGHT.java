@@ -10,7 +10,7 @@ public class DummyRIGHT extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, null);
+        MecanumDrive drive = new MecanumDrive(this);
 
         drive.toggleFieldCentric();
 

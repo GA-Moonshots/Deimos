@@ -1,15 +1,19 @@
 package org.firstinspires.ftc.teamcode.drives;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
@@ -33,27 +37,27 @@ public class MecanumDrive extends Drivetrain {
     private boolean isTargetSet = false;
     private double gyroTarget = 0.0d;
 
-    public MecanumDrive(HardwareMap hardwareMap, Telemetry telemetry) {
-        super(hardwareMap, telemetry, new IMU.Parameters(
+    public MecanumDrive(LinearOpMode opMode) {
+        super(opMode, new IMU.Parameters(
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.UP,
                         RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
                 )
         ));
 
-        leftFront = hardwareMap.get(DcMotor.class, "leftFront");
-        rightFront = hardwareMap.get(DcMotor.class, "rightFront");
-        leftBack = hardwareMap.get(DcMotor.class, "leftBack");
-        rightBack = hardwareMap.get(DcMotor.class, "rightBack");
+        leftFront = opMode.hardwareMap.get(DcMotor.class, "leftFront");
+        rightFront = opMode.hardwareMap.get(DcMotor.class, "rightFront");
+        leftBack = opMode.hardwareMap.get(DcMotor.class, "leftBack");
+        rightBack = opMode.hardwareMap.get(DcMotor.class, "rightBack");
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rearDistance = new DistanceSensor(hardwareMap, "rear");
-        leftDistance = new DistanceSensor(hardwareMap, "left");
-        rightDistance = new DistanceSensor(hardwareMap, "right");
-        this.camera = null;
 
+        rearDistance = new DistanceSensor(opMode.hardwareMap, "rear");
+        rightDistance = new DistanceSensor(opMode.hardwareMap, "right");
+        leftDistance = new DistanceSensor(opMode.hardwareMap, "left");
+        this.camera = new Camera(opMode.hardwareMap, telemetry);
         fieldCentricTarget = imu.getZAngle();
     }
 
@@ -130,46 +134,71 @@ public class MecanumDrive extends Drivetrain {
         rightBack.setPower(Range.clip(m4, -MOTOR_MAX_SPEED, MOTOR_MAX_SPEED));
     }
 
-    @Override
-    public void turnRobotToAngle(double target) {
-        // NOTE: Negative return values will increase the gyro's value
-        boolean wasFieldCentric = isFieldCentric;
-        isFieldCentric = false;
 
-        int ENOUGH_CHECKS = 15; // how many times do we pass our target until we're satisfied?
-        int check = 0;
-        // determine the error
-        double error = 0; // target - drive.gyro.getAngle();
-        //TODO note time and cut off at like 3 seconds
-        while(ENOUGH_CHECKS > check) {
-            // determine the power output neutral of direction
-            double output = Math.abs(error / target) * MOTOR_MAX_SPEED;
-            if (output > MOTOR_MAX_SPEED) output = MOTOR_MAX_SPEED;
+    public void turnRobotByDegree(double target) {
+        double targetAngle = getIMU().getZAngle() + target;
+        if(targetAngle > 180) {
+            targetAngle -= 360;
+        }
 
-            // determine the direction
-            // if I was trying to go a positive angle change from the start
-            if (target > 0) {
-                if (error > 0)
-                    drive(0, 0, -output);
-                else
-                    drive(0, 0, output);
-            }
-            // if I was trying to go a negative angle from the start
-            else{
-                if (error < 0)
-                    drive(0, 0, output);
-                else
-                    drive(0, 0, -output);
-            }
-            // ARE WE THERE YET?
-            if (Math.abs(error) < 2) check++;
+        while(Math.abs(targetAngle - getIMU().getZAngle()) >= 1 && opMode.opModeIsActive()) {
+            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
+            telemetry.addData("IMU Angle", getIMU().getZAngle());
+            telemetry.addData("Target", targetAngle);
+            telemetry.update();
+            //drive(0.0, 0.0, Math.toRadians(getIMU().getZAngle()));
+            drive(0,0,-.3);
 
-        } // end while loop
-
-        // shut down motors
+        }
         stop();
-        // restore previous fieldCentric state
-        isFieldCentric = wasFieldCentric;
+
 
     }
+
+    public void goToDistanceFromWall(double distance){
+        //TODO: include a time check so we don't accidentally drive across field
+
+        while(rearDistance.getDistance(DistanceUnit.INCH) <= distance && opMode.opModeIsActive()) {
+            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
+            telemetry.addData("IMU Angle", getIMU().getZAngle());
+            telemetry.update();
+            drive(-0.3, 0.0, 0.0);
+        }
+        stop();
+    }
+    public void goToDistanceToWall(double distance){
+        while(rearDistance.getDistance(DistanceUnit.INCH) >= distance && opMode.opModeIsActive()) {
+            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
+            telemetry.addData("IMU Angle", getIMU().getZAngle());
+            telemetry.update();
+            drive(0.3, 0.0, 0.0);
+        }
+        stop();
+
+
+    }
+
+    public void turnUntilWeSeeProp(){
+        //TODO make turn a turner operator to make it modular
+        while(rearDistance.getDistance(DistanceUnit.INCH) >= 8 && opMode.opModeIsActive()) {
+            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
+            telemetry.addData("IMU Angle", getIMU().getZAngle());
+            telemetry.update();
+            drive(0.0, 0.0, 0.3);
+        }
+        stop();
+    }
+
+    public void strafeUntilWall(double str){
+        DistanceSensor ds = str > 0 ? rightDistance : leftDistance;
+        ElapsedTime rt = new ElapsedTime();
+        while(ds.getDistance(DistanceUnit.INCH) >= 4 && rt.seconds() <= 3 && opMode.opModeIsActive()) {
+            drive(0, str,0);
+
+        }
+        stop();
+
+    }
+
+
 }

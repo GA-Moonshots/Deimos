@@ -1,6 +1,11 @@
 package org.firstinspires.ftc.teamcode.drives;
 
+import android.graphics.Path;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -28,6 +33,7 @@ public abstract class Drivetrain {
     protected Telemetry telemetry;
     protected IMU imu;
     protected Camera camera;
+    protected LinearOpMode opMode;
     public Camera getCamera() {
         return camera;
     }
@@ -61,10 +67,11 @@ public abstract class Drivetrain {
         NONE
     }
 
-    public Drivetrain(HardwareMap hardwareMap, Telemetry telemetry, com.qualcomm.robotcore.hardware.IMU.Parameters parameters) {
-        this.imu = new IMU(hardwareMap, parameters);
-        this.telemetry = telemetry;
-        this.camera = new Camera(hardwareMap, telemetry);
+    public Drivetrain(LinearOpMode opMode, com.qualcomm.robotcore.hardware.IMU.Parameters parameters) {
+        this.imu = new IMU(opMode.hardwareMap, parameters);
+        this.telemetry = opMode.telemetry;
+        this.camera = new Camera(opMode.hardwareMap, opMode.telemetry);
+        this.opMode = opMode;
     }
 
 
@@ -92,13 +99,7 @@ public abstract class Drivetrain {
     /**
      * @param target the absolute angle to move to
      */
-    public abstract void turnRobotToAngle(double target);
 
-    /**
-     * @brief Blocking imu-adjusted field centric version of turnRobotToAngle
-     * @param target The angle to adjust the current angle by
-     */
-    public void turnRobotByDegree(double target) { turnRobotToAngle(imu.getZAngle() + target); }
 
     /**
      * Stops the drive from moving
@@ -137,12 +138,21 @@ public abstract class Drivetrain {
         //turn to angle
         telemetry.addData("targetAngFound", targetAng);
 
-        turnRobotToAngle(targetAng);
+        //turnRobotToAngle(targetAng);
 
 
     }
 
-    public boolean alignToAprilTag_rework(AprilTagToAlign alignment) {
+    public void nudge(double str) {
+        ElapsedTime rt = new ElapsedTime();
+        while(rt.seconds() < 0.5 && opMode.opModeIsActive())
+            drive(str, 0.0, 0.0);
+        stop();
+
+
+    }
+
+    public boolean alignToAprilTag(AprilTagToAlign alignment) {
         if(telemetry != null) {
             switch (alignment) {
                 case LEFT: telemetry.addData("Aligning To", "Left"); break;
@@ -244,7 +254,7 @@ public abstract class Drivetrain {
      * @param alignment the AprilTagToAlign
      * @return true if this method can be called again without adjustment
      */
-    public boolean alignToAprilTag(AprilTagToAlign alignment) {
+    public boolean rememberThis(AprilTagToAlign alignment) {
         switch (alignment) {
             case LEFT: telemetry.addData("Aligning To", "Left"); break;
             case CENTER: telemetry.addData("Aligning To", "Center"); break;

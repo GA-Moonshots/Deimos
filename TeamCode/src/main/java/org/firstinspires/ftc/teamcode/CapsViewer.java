@@ -64,11 +64,11 @@ public class CapsViewer extends LinearOpMode {
         IMU imu;
         try {
             try {
-                drive = new SwerveDrive(hardwareMap, telemetry);
+                drive = new SwerveDrive(this);
                 driveType = DriveType.SWERVE;
 
             } catch (Exception e) {
-                drive = new MecanumDrive(hardwareMap, telemetry);
+                drive = new MecanumDrive(this);
                 driveType = DriveType.MECANUM;
             }
             imu = drive.getIMU();

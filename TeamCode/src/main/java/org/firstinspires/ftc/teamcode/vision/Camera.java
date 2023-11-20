@@ -39,4 +39,9 @@ public class Camera {
         }
         return aprilTag.getDetections();
     }
+
+    public void shutdown() {
+        //visionPortal.stopStreaming();
+        visionPortal.close();
+    }
 }

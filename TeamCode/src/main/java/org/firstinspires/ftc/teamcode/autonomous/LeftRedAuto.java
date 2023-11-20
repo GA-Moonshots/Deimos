@@ -29,26 +29,14 @@ public class LeftRedAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        drive = new MecanumDrive(hardwareMap, null);
+        drive = new MecanumDrive(this);
         arm = new Arm(hardwareMap, null);
 
         waitForStart();
 
-        while(drive.rearDistance.getDistance(DistanceUnit.INCH) <= 18 && opModeIsActive()) {
-            telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
-            telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.update();
-            drive.drive(-0.3, 0.0, 0.0);
-        }
-        drive.stop();
+        drive.goToDistanceFromWall(20);
 
-        while(drive.rearDistance.getDistance(DistanceUnit.INCH) >= 8 && opModeIsActive()) {
-            telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
-            telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.update();
-            drive.drive(0.0, 0.0, -0.3);
-        }
-        drive.stop();
+        drive.turnUntilWeSeeProp();
 
         double targetAngle = drive.getIMU().getZAngle() + 180;
         if(targetAngle > 180) {
@@ -162,5 +150,9 @@ public class LeftRedAuto extends LinearOpMode {
         while(opModeIsActive() && drive.rearDistance.getDistance() >= 1) {
             drive.drive(0.0, 0.2, 0.0);
         }
+
+        drive.stop();
+        drive.camera.shutdown();
+        this.terminateOpModeNow();
     }
 }

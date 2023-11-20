@@ -21,7 +21,7 @@ public class TestSuite extends LinearOpMode {
 
     public void pidTest() {
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, telemetry);
+        MecanumDrive drive = new MecanumDrive(this);
         PIDController controller = new PIDController(telemetry, "theta");
         telemetry.addData("IMU Rotation", "(%.2f, %.2f, %.2f)",
                 drive.getIMU().getXAngle(), drive.getIMU().getYAngle(), drive.getIMU().getZAngle());

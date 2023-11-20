@@ -30,7 +30,7 @@ public class Deimos extends LinearOpMode {
     public void runOpMode() {
         // Init (runs once)
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        driveyMcDriveDriveDriverson = new MecanumDrive(hardwareMap, telemetry);
+        driveyMcDriveDriveDriverson = new MecanumDrive(this);
         arm = new Arm(hardwareMap, telemetry);
 
         // Init Loop (runs until stop button or start button is pressed)

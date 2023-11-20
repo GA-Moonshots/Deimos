@@ -30,48 +30,24 @@ public class LeftBlueAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        drive = new MecanumDrive(hardwareMap, null);
+        drive = new MecanumDrive(this);
         arm = new Arm(hardwareMap, null);
 
         waitForStart();
 
-        while(drive.rearDistance.getDistance(DistanceUnit.INCH) <= 20 && opModeIsActive()) {
-            telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
-            telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.update();
-            drive.drive(-0.3, 0.0, 0.0);
-        }
-        drive.stop();
+        // APPROACH THE RANDOMIZER
+        drive.goToDistanceFromWall(20);
 
-        while(drive.rearDistance.getDistance(DistanceUnit.INCH) >= 8 && opModeIsActive()) {
-            telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
-            telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.update();
-            drive.drive(0.0, 0.0, 0.3);
-        }
-        drive.stop();
+        // TURN UNTIL WE SEE SOMETHING
+        drive.turnUntilWeSeeProp();
 
-        double targetAngle = drive.getIMU().getZAngle() + 180;
-        if(targetAngle > 180) {
-            targetAngle -= 360;
-        }
+        drive.turnRobotByDegree(180);
 
-        while(Math.abs(targetAngle - drive.getIMU().getZAngle()) >= 1 && opModeIsActive()) {
-            telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
-            telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.addData("Target", targetAngle);
-            telemetry.update();
-            drive.drive(0.0, 0.0, -0.3);
-        }
-        drive.stop();
-
+        // nudge forward drop claw than get back to square
         drive.toggleFieldCentric();
-        ElapsedTime rt = new ElapsedTime();
-        while(rt.seconds() < 0.5 && opModeIsActive())
-            drive.drive(-0.2, 0.0, 0.0);
-        drive.stop();
+        drive.nudge(-0.2);
         sleep(100);
-
+        // lowers claw and drops pixel
         arm.goToPickUp();
 
         sleep(1000);
@@ -79,17 +55,22 @@ public class LeftBlueAuto extends LinearOpMode {
         arm.close();
         arm.travelMode();
 
-        rt.reset();
-        while(rt.seconds() < 0.5 && opModeIsActive())
-            drive.drive(0.2, 0.0, 0.0);
-        drive.stop();
-        drive.toggleFieldCentric();
+        drive.nudge(0.3);
 
         while(Math.abs(drive.getIMU().getZAngle()) >= 1 && opModeIsActive()) {
             drive.drive(0.0, 0.0, Math.toRadians(drive.getIMU().getZAngle()));
         }
         drive.stop();
 
+        drive.goToDistanceToWall(4);
+
+        drive.strafeUntilWall(-0.3);
+        // Turning fieldCentric back on at end of auto
+        //TODO turn off fieldCentric all toghether?
+        drive.toggleFieldCentric();
+
+
+        /*
         while((drive.rearDistance.getDistance() >= 6 || drive.leftDistance.getDistance() >= 24) && opModeIsActive()) {
             telemetry.addData("Rear Distance", drive.rearDistance.getDistance());
             telemetry.addData("Rear Distance", drive.leftDistance.getDistance());
@@ -104,7 +85,11 @@ public class LeftBlueAuto extends LinearOpMode {
                     Range.clip((-(drive.leftDistance.getDistance() - 24)), -1, 1) / 4,
                     Math.toRadians(drive.getIMU().getZAngle()));
         }
+        */
+        // DONE: CLEAN UP
         drive.stop();
+        drive.camera.shutdown();
+        this.terminateOpModeNow();
         /*
         sleep(100);
         drive.toggleFieldCentric();

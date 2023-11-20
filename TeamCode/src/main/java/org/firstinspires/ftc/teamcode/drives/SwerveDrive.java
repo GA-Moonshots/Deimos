@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.drives;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -40,18 +41,18 @@ public class SwerveDrive extends Drivetrain {
         return fieldCentric;
     }
 
-    public SwerveDrive(HardwareMap hardwareMap, Telemetry telemetry) {
-        super(hardwareMap, telemetry, new IMU.Parameters(
+    public SwerveDrive(LinearOpMode opMode) {
+        super(opMode, new IMU.Parameters(
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.FORWARD,
                         RevHubOrientationOnRobot.UsbFacingDirection.UP
                 )
         ));
 
-        llMotor = hardwareMap.get(DcMotor.class, "llMotor");
-        lrMotor = hardwareMap.get(DcMotor.class, "lrMotor");
-        rlMotor = hardwareMap.get(DcMotor.class, "rlMotor");
-        rrMotor = hardwareMap.get(DcMotor.class, "rrMotor");
+        llMotor = opMode.hardwareMap.get(DcMotor.class, "llMotor");
+        lrMotor = opMode.hardwareMap.get(DcMotor.class, "lrMotor");
+        rlMotor = opMode.hardwareMap.get(DcMotor.class, "rlMotor");
+        rrMotor = opMode.hardwareMap.get(DcMotor.class, "rrMotor");
     }
 
     @Override
@@ -160,30 +161,8 @@ public class SwerveDrive extends Drivetrain {
         rrMotor.setPower(Range.clip(m4, -MOTOR_MAX_SPEED, MOTOR_MAX_SPEED));
     }
 
-    @Override
-    public void turnRobotToAngle(double target) {
-        double rightWheelAngle = getWheelAngle(rlMotor, rrMotor);
-        double leftWheelAngle = getWheelAngle(llMotor, lrMotor);
-        double multiplier = 1;
-        double leftRotPower, rightRotPower;
 
-        // If Wheel's forward face is away from the 0 mark, reverse rotation
-        if(Math.abs(leftWheelAngle) >= 90) {
-            multiplier = -1;
-        }
 
-        // multiplier flips rotation direction; Rest calculates how much rotation we need
-        // https://www.geogebra.org/calculator/ucaxvmtw
-        leftRotPower = multiplier * SWERVE_WHEEL_ROT_MULTIPLIER * Math.sin(Math.toRadians(-leftWheelAngle));
-        rightRotPower = multiplier * SWERVE_WHEEL_ROT_MULTIPLIER * Math.sin(Math.toRadians(-rightWheelAngle));
-
-        drive(
-                -(MOTOR_MAX_SPEED * multiplier) + leftRotPower,
-                -(MOTOR_MAX_SPEED * multiplier) - leftRotPower,
-                rightRotPower - (MOTOR_MAX_SPEED * multiplier),
-                -(MOTOR_MAX_SPEED * multiplier) - rightRotPower
-        );
-    }
 
     public void setDistanceToTravel(double distance) {
         llMotor.setTargetPosition(

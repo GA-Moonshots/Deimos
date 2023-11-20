@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.systems.Arm;
 public class DummyLEFT extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        MecanumDrive drive = new MecanumDrive(hardwareMap, null);
+        MecanumDrive drive = new MecanumDrive(this);
 
         waitForStart();
         ElapsedTime rt = new ElapsedTime();
