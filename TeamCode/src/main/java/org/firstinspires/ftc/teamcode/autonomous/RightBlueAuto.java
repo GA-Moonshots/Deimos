@@ -7,9 +7,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drives.MecanumDrive;
-import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
 import org.firstinspires.ftc.teamcode.systems.Arm;
-import org.firstinspires.ftc.teamcode.vision.Camera;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
@@ -34,9 +32,9 @@ public class RightBlueAuto extends LinearOpMode {
 
         waitForStart();
 
-        drive.goToDistanceFromWall(20);
+        drive.fwdFromWall(20);
 
-        drive.turnUntilWeSeeProp();
+        drive.faceTheProp();
 
         double targetAngle = drive.getIMU().getZAngle() + 180;
         if(targetAngle > 180) {

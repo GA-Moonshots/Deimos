@@ -139,17 +139,17 @@ public abstract class Drivetrain {
         telemetry.addData("targetAngFound", targetAng);
 
         //turnRobotToAngle(targetAng);
-
-
     }
 
+    /**
+     * Drive forward or backward for half a second
+     * @param str negative is fwd
+     */
     public void nudge(double str) {
         ElapsedTime rt = new ElapsedTime();
         while(rt.seconds() < 0.5 && opMode.opModeIsActive())
             drive(str, 0.0, 0.0);
         stop();
-
-
     }
 
     public boolean alignToAprilTag(AprilTagToAlign alignment) {

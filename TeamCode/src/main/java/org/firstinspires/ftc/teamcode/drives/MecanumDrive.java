@@ -2,19 +2,12 @@ package org.firstinspires.ftc.teamcode.drives;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Const;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
 import org.firstinspires.ftc.teamcode.vision.Camera;
@@ -25,6 +18,7 @@ public class MecanumDrive extends Drivetrain {
     private final DcMotor rightFront;
     private final DcMotor leftBack;
     private final DcMotor rightBack;
+
     // SENSORS
     public DistanceSensor rearDistance;
     public DistanceSensor leftDistance;
@@ -37,6 +31,11 @@ public class MecanumDrive extends Drivetrain {
     private boolean isTargetSet = false;
     private double gyroTarget = 0.0d;
 
+    /**
+     * This constructor takes a reference to the aggregate object that owns it. It's a controversial
+     * design decision and one that can be avoided with a command scheduler
+     * @param opMode
+     */
     public MecanumDrive(LinearOpMode opMode) {
         super(opMode, new IMU.Parameters(
                 new RevHubOrientationOnRobot(
@@ -84,7 +83,6 @@ public class MecanumDrive extends Drivetrain {
         } else if(!isGyroLocked) {
             isTargetSet = false;
         }
-
 
         // I'm tired of figuring out the input problems so the inputs are still in flight stick mode
         // Meaning forward is reversed
@@ -151,14 +149,17 @@ public class MecanumDrive extends Drivetrain {
 
         }
         stop();
-
-
     }
 
-    public void goToDistanceFromWall(double distance){
-        //TODO: include a time check so we don't accidentally drive across field
-
-        while(rearDistance.getDistance(DistanceUnit.INCH) <= distance && opMode.opModeIsActive()) {
+    /**
+     * Drives away from wall until rear sensor reaches the requested distance or until 3 seconds
+     * have passed
+     * @param distance requested distance in inches
+     */
+    public void fwdFromWall(double distance){
+        ElapsedTime rt = new ElapsedTime();
+        while(rearDistance.getDistance(DistanceUnit.INCH) <= distance && rt.seconds() <= 3
+                && opMode.opModeIsActive()) {
             telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
             telemetry.addData("IMU Angle", getIMU().getZAngle());
             telemetry.update();
@@ -166,7 +167,12 @@ public class MecanumDrive extends Drivetrain {
         }
         stop();
     }
-    public void goToDistanceToWall(double distance){
+
+    /**
+     * Reverses the robot until it reaches the requested distance
+     * @param distance requested distance in inches
+     */
+    public void backUpToWall(double distance){
         while(rearDistance.getDistance(DistanceUnit.INCH) >= distance && opMode.opModeIsActive()) {
             telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
             telemetry.addData("IMU Angle", getIMU().getZAngle());
@@ -174,12 +180,32 @@ public class MecanumDrive extends Drivetrain {
             drive(0.3, 0.0, 0.0);
         }
         stop();
-
-
     }
 
-    public void turnUntilWeSeeProp(){
-        //TODO make turn a turner operator to make it modular
+    public void turnToZero(){
+        while(Math.abs(imu.getZAngle()) >= 1 && opMode.opModeIsActive()) {
+            drive(0.0, 0.0, Math.toRadians(imu.getZAngle()));
+        }
+        stop();
+    }
+
+    /**
+     * Strafes until it sees a wall within 5 inches or until 3 seconds pass. Positive to the right
+     * and negative to the left.
+     * @param str The distance in inches to the wall
+     */
+    public void strafeUntilWall(double str){
+        // are we going left or right. Use the right sensor
+        DistanceSensor ds = str > 0 ? rightDistance : leftDistance;
+        ElapsedTime rt = new ElapsedTime();
+        while(ds.getDistance(DistanceUnit.INCH) >= 5 && rt.seconds() <= 3 && opMode.opModeIsActive()) {
+            drive(0, str,0);
+        }
+        stop();
+    }
+
+    public void faceTheProp(){
+        //TODO Use the left and right sensors to determine if it's left, right, or failing those, front
         while(rearDistance.getDistance(DistanceUnit.INCH) >= 8 && opMode.opModeIsActive()) {
             telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
             telemetry.addData("IMU Angle", getIMU().getZAngle());
@@ -187,18 +213,10 @@ public class MecanumDrive extends Drivetrain {
             drive(0.0, 0.0, 0.3);
         }
         stop();
-    }
 
-    public void strafeUntilWall(double str){
-        DistanceSensor ds = str > 0 ? rightDistance : leftDistance;
-        ElapsedTime rt = new ElapsedTime();
-        while(ds.getDistance(DistanceUnit.INCH) >= 4 && rt.seconds() <= 3 && opMode.opModeIsActive()) {
-            drive(0, str,0);
-
-        }
-        stop();
-
+        turnRobotByDegree(180);
     }
 
 
+    
 }

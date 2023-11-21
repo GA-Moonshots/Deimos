@@ -3,17 +3,9 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drives.MecanumDrive;
-import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
 import org.firstinspires.ftc.teamcode.systems.Arm;
-import org.firstinspires.ftc.teamcode.vision.Camera;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Left Blue Autonomous")
 public class LeftBlueAuto extends LinearOpMode {
@@ -35,61 +27,39 @@ public class LeftBlueAuto extends LinearOpMode {
 
         waitForStart();
 
-        // APPROACH THE RANDOMIZER
-        drive.goToDistanceFromWall(20);
+        // approach the prop
+        drive.fwdFromWall(20);
 
-        // TURN UNTIL WE SEE SOMETHING
-        drive.turnUntilWeSeeProp();
+        drive.faceTheProp();
 
-        drive.turnRobotByDegree(180);
-
-        // nudge forward drop claw than get back to square
+        // go robot centric driving
         drive.toggleFieldCentric();
+
+        // nudge forward
         drive.nudge(-0.2);
         sleep(100);
+
         // lowers claw and drops pixel
         arm.goToPickUp();
-
         sleep(1000);
 
-        arm.close();
         arm.travelMode();
 
+        // get back
         drive.nudge(0.3);
 
-        while(Math.abs(drive.getIMU().getZAngle()) >= 1 && opModeIsActive()) {
-            drive.drive(0.0, 0.0, Math.toRadians(drive.getIMU().getZAngle()));
-        }
-        drive.stop();
+        drive.turnToZero();
 
-        drive.goToDistanceToWall(4);
-
+        // GET TO PARK
+        drive.backUpToWall(4);
         drive.strafeUntilWall(-0.3);
-        // Turning fieldCentric back on at end of auto
-        //TODO turn off fieldCentric all toghether?
-        drive.toggleFieldCentric();
 
-
-        /*
-        while((drive.rearDistance.getDistance() >= 6 || drive.leftDistance.getDistance() >= 24) && opModeIsActive()) {
-            telemetry.addData("Rear Distance", drive.rearDistance.getDistance());
-            telemetry.addData("Rear Distance", drive.leftDistance.getDistance());
-            telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.addData("Inputs", "(%.2f, %.2f, %.2f)", (drive.rearDistance.getDistance() - 6),
-                    -(drive.leftDistance.getDistance() - 24),
-                    Math.toRadians(drive.getIMU().getZAngle()));
-            telemetry.update();
-
-            drive.drive(
-                    Range.clip((drive.rearDistance.getDistance() - 6), -1, 1) / 4,
-                    Range.clip((-(drive.leftDistance.getDistance() - 24)), -1, 1) / 4,
-                    Math.toRadians(drive.getIMU().getZAngle()));
-        }
-        */
         // DONE: CLEAN UP
         drive.stop();
         drive.camera.shutdown();
         this.terminateOpModeNow();
+
+        // PLACE PIXEL ON BOARD
         /*
         sleep(100);
         drive.toggleFieldCentric();
