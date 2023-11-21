@@ -41,51 +41,27 @@ public class RightBlueAuto extends LinearOpMode {
             targetAngle -= 360;
         }
 
-        while(Math.abs(targetAngle - drive.getIMU().getZAngle()) >= 1 && opModeIsActive()) {
-            telemetry.addData("Rear Distance", drive.rearDistance.getDistance(DistanceUnit.INCH));
-            telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.addData("Target", targetAngle);
-            telemetry.update();
-            drive.drive(0.0, 0.0, -0.3);
-        }
-        drive.stop();
+        // go robot centric driving
+        drive.toggleFieldCentric();
 
-        arm.open();
-        arm.wristTo(0.5);
-
-        sleep(3000);
-
-        arm.close();
-        arm.wristTo(1.0);
-
-        while(Math.abs(drive.getIMU().getZAngle()) >= 1 && opModeIsActive()) {
-            drive.drive(0.0, 0.0, Math.toRadians(drive.getIMU().getZAngle()));
-        }
-        drive.stop();
-
-        while((drive.rearDistance.getDistance() >= 6 || drive.leftDistance.getDistance() >= 24) && opModeIsActive()) {
-            telemetry.addData("Rear Distance", drive.rearDistance.getDistance());
-            telemetry.addData("Rear Distance", drive.leftDistance.getDistance());
-            telemetry.addData("IMU Angle", drive.getIMU().getZAngle());
-            telemetry.addData("Inputs", "(%.2f, %.2f, %.2f)", (drive.rearDistance.getDistance() - 6),
-                    -(drive.leftDistance.getDistance() - 24),
-                    Math.toRadians(drive.getIMU().getZAngle()));
-            telemetry.update();
-
-            drive.drive(
-                    Range.clip((drive.rearDistance.getDistance() - 6), -1, 1) / 4,
-                    Range.clip((-(drive.leftDistance.getDistance() - 24)), -1, 1) / 4,
-                    Math.toRadians(drive.getIMU().getZAngle()));
-        }
-        drive.stop();
+        // nudge forward
+        drive.nudge(-0.2);
         sleep(100);
-        drive.toggleFieldCentric();
-        while(Math.abs(drive.getIMU().getZAngle() + 90) >= 1 && opModeIsActive()) {
-            drive.drive(-0.1, 0.0, Math.toRadians(drive.getIMU().getZAngle() + 90));
-        }
-        drive.toggleFieldCentric();
-        drive.stop();
 
+        // lowers claw and drops pixel
+        arm.goToPickUp();
+        sleep(1000);
+
+        // move claw out of the pixel's way
+        arm.travelMode();
+
+        // get back
+        drive.nudge(0.3);
+
+        drive.turnToZero();
+
+        drive.fwdFromWall(50);
+        
         while(drive.camera.getDetections().size() == 0 && opModeIsActive()) {
             drive.drive(-0.2, 0.0, 0.0);
         }

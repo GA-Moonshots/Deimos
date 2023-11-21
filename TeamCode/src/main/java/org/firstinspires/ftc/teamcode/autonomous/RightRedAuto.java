@@ -63,6 +63,6 @@ public class RightRedAuto extends LinearOpMode {
 
         drive.stop();
         drive.camera.shutdown();
-        this.terminateOpModeNow();
+        //this.terminateOpModeNow();
     }
 }

@@ -70,7 +70,7 @@ public abstract class Drivetrain {
     public Drivetrain(LinearOpMode opMode, com.qualcomm.robotcore.hardware.IMU.Parameters parameters) {
         this.imu = new IMU(opMode.hardwareMap, parameters);
         this.telemetry = opMode.telemetry;
-        this.camera = new Camera(opMode.hardwareMap, opMode.telemetry);
+        //this.camera = new Camera(opMode.hardwareMap, opMode.telemetry);
         this.opMode = opMode;
     }
 

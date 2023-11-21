@@ -46,6 +46,12 @@ public class Arm {
     private final Telemetry telemetry;
     private final DcMotor motor;
 
+    public enum RunState {
+        GOTO_DROPOFF,
+        GOTO_GROUND,
+        NONE
+    }
+
 
     public Arm(HardwareMap hardwareMap, Telemetry telemetry) {
         this.motor = hardwareMap.get(DcMotor.class, "arm");

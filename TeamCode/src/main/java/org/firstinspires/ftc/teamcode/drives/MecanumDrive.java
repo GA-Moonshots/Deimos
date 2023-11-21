@@ -140,7 +140,6 @@ public class MecanumDrive extends Drivetrain {
         }
 
         while(Math.abs(targetAngle - getIMU().getZAngle()) >= 1 && opMode.opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
             telemetry.addData("IMU Angle", getIMU().getZAngle());
             telemetry.addData("Target", targetAngle);
             telemetry.update();
@@ -190,7 +189,7 @@ public class MecanumDrive extends Drivetrain {
     }
 
     /**
-     * Strafes until it sees a wall within 5 inches or until 3 seconds pass. Positive to the right
+     * Strafes until it sees a wall within 5 inches or until 4.75 seconds pass. Positive to the right
      * and negative to the left.
      * @param str The distance in inches to the wall
      */
@@ -198,23 +197,38 @@ public class MecanumDrive extends Drivetrain {
         // are we going left or right. Use the right sensor
         DistanceSensor ds = str > 0 ? rightDistance : leftDistance;
         ElapsedTime rt = new ElapsedTime();
-        while(ds.getDistance(DistanceUnit.INCH) >= 5 && rt.seconds() <= 3 && opMode.opModeIsActive()) {
+        while(ds.getDistance(DistanceUnit.INCH) >= 5 && rt.seconds() < 4.75 && opMode.opModeIsActive()) {
             drive(0, str,0);
         }
         stop();
     }
 
     public void faceTheProp(){
-        //TODO Use the left and right sensors to determine if it's left, right, or failing those, front
-        while(rearDistance.getDistance(DistanceUnit.INCH) >= 8 && opMode.opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
-            telemetry.addData("IMU Angle", getIMU().getZAngle());
-            telemetry.update();
+        ElapsedTime rt = new ElapsedTime();
+        while(leftDistance.getDistance(DistanceUnit.INCH) >= 10 && rt.seconds() < 1) {
             drive(0.0, 0.0, 0.3);
         }
         stop();
+        if(leftDistance.getDistance(DistanceUnit.INCH) <= 8) {
+            turnRobotByDegree(90);
+            return;
+        }
+        rt.reset();
+        while(rightDistance.getDistance(DistanceUnit.INCH) >= 10 && rt.seconds() < 2) {
+            drive(0.0, 0.0, -0.3);
+        }
+        stop();
 
-        turnRobotByDegree(180);
+        if(rightDistance.getDistance(DistanceUnit.INCH) <= 10) {
+            turnRobotByDegree(-90);
+            return;
+        }
+
+        rt.reset();
+        while(rt.seconds() < 1) {
+            drive(0.0, 0.0, 0.3);
+        }
+        stop();
     }
 
 

@@ -24,7 +24,10 @@ public class Deimos extends LinearOpMode {
     private boolean gp1aPressed = false;
     private boolean gp2aPressed = false;
     private boolean gp2bPressed = false;
+    private boolean gp2xPressed = false;
+    private boolean gp2yPressed = false;
     private Drivetrain.AprilTagToAlign align = Drivetrain.AprilTagToAlign.NONE;
+    private Arm.RunState armState = Arm.RunState.NONE;
     
     @Override
     public void runOpMode() {
@@ -62,6 +65,12 @@ public class Deimos extends LinearOpMode {
             // Driver 2: Responsible for the subsystem attachment
             driver2Inputs();
 
+            // --END OF LOOP CHECKS--
+            // Avoid double pressing the A button by storing its last state
+            //gp1aPressed = gamepad1.a;
+
+
+
             telemetry.update();
         }
         // STOP ALL SYSTEMS AFTER EXECUTION LOOP
@@ -79,6 +88,9 @@ public class Deimos extends LinearOpMode {
         boolean aDown = gamepad1.a && !gp1aPressed && !gamepad1.start;
         if(aDown) {
             driveyMcDriveDriveDriverson.toggleFieldCentric();
+            gp1aPressed = true;
+        } else {
+
         }
 
         // B BUTTON: available
@@ -127,9 +139,6 @@ public class Deimos extends LinearOpMode {
             driveyMcDriveDriveDriverson.drive(forward * speedMod, strafe, turn);
         }
 
-        // --END OF LOOP CHECKS--
-        // Avoid double pressing the A button by storing its last state
-        gp1aPressed = gamepad1.a;
     }
 
     /**
@@ -137,31 +146,42 @@ public class Deimos extends LinearOpMode {
      * This function's implementation changes quickly and rapidly every year.
      */
     private void driver2Inputs() {
-
         // A BUTTON: grip game object for traveling
-        if(gamepad2.a && !gp2aPressed && !gamepad2.start){
+        if(gamepad2.a && !gamepad2.start){
             arm.travelMode();
         }
 
         // B BUTTON: toggle claw
-        if(gamepad2.b && !gp2bPressed && !gamepad2.start){
+        if(gamepad2.b && !gp2bPressed && !gamepad2.start) {
             arm.toggleOpen();
             telemetry.addData("Hand open", gamepad2.b);
         }
+        gp2bPressed = gamepad2.b;
 
         // X BUTTON: position arm for pickup
-        if(gamepad2.x) arm.goToPickUp();
+        if(gamepad2.x && !gp2xPressed && armState != Arm.RunState.GOTO_GROUND)
+            armState = Arm.RunState.GOTO_GROUND;
+        else if(gamepad2.x && !gp2xPressed)
+            armState = Arm.RunState.NONE;
+        gp2xPressed = gamepad2.x;
 
         // Y BUTTON: position arm for drop-off
-        if(gamepad2.y) arm.goToDropOff();
+        if(gamepad2.y && !gp2yPressed && armState != Arm.RunState.GOTO_DROPOFF)
+            armState = Arm.RunState.GOTO_DROPOFF;
+        else if(gamepad2.y && !gp2yPressed)
+            armState = Arm.RunState.NONE;
+        gp2yPressed = gamepad2.y;
 
-        // DPAD: wrist
+        if(armState != Arm.RunState.NONE)
+            return;
+
+        // DPAD VERTICAL: wrist
         if(gamepad2.dpad_up && !gamepad2.dpad_down) {
             arm.wristUp();
         } else if(gamepad2.dpad_down && !gamepad2.dpad_up) {
             arm.wristDown();
         }
-
+        // DPAD HORIZONTAL: roll
         if(gamepad2.dpad_left && !gamepad2.dpad_right) {
             arm.rollNegative();
         } else if(gamepad2.dpad_right && !gamepad2.dpad_left) {
@@ -179,12 +199,6 @@ public class Deimos extends LinearOpMode {
             arm.changeOffset(-5);
         arm.move(armRotate);
 
-
-        // --END OF LOOP CHECKS--
-        gp2aPressed = gamepad2.a;
-        gp2bPressed = gamepad2.b;
-        telemetry.addData("Arm", arm);
-        telemetry.addData("GP2Info", String.format("(%.2f)", armRotate));
     }
 
 }
