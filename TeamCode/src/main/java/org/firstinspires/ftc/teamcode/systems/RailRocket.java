@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode.systems;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Constants;
 
 public class RailRocket {
-    // telemetry is neeeded for robotics stuff
-    protected Telemetry telemetry;
+    private LinearOpMode opMode;
     // static variables can't go in the method, must go at top
-    // final = unchangablE
     public static final double POWER = 1;
     // the position of the motor when opened
     public static final double OPENED_POSITION = 1;
@@ -29,12 +29,11 @@ public class RailRocket {
     private Servo servo;
 
     // when creating a constructor for the robot these parameters are standard for most of this stuff
-    public RailRocket(HardwareMap hardwareMap, Telemetry telemetry){
-        // need the given telemetry because robotics
-        this.telemetry = telemetry;
+    public RailRocket(LinearOpMode opMode){
+        this.opMode = opMode;
 
         // look for a servo with a release pin and set this servo equal to that servo
-        this.servo = hardwareMap.get(Servo.class, "releasePin");
+        this.servo = opMode.hardwareMap.get(Servo.class, Constants.RELEASE_SERVO_NAME);
         // at this point we have the servo, time to make it do stuff :)
 
     }

@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -20,12 +21,12 @@ public class Camera {
     private VisionPortal visionPortal;
 
     public Camera(HardwareMap hardwareMap, Telemetry telemetry) {
-        //aprilTag = new AprilTagProcessor.Builder()
-        //        .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-        //        .build();
-        WebcamName name = hardwareMap.get(WebcamName.class, "Webcam 1");
+        aprilTag = new AprilTagProcessor.Builder()
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .build();
+        WebcamName name = hardwareMap.get(WebcamName.class, Constants.WEBCAM_NAME);
         visionPortal = new VisionPortal.Builder()
-                .setCamera(name)//.addProcessor(aprilTag)
+                .setCamera(name).addProcessor(aprilTag)
                 .build();
     }
 

@@ -7,16 +7,22 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.teamcode.Constants;
 
 public class IMU {
     public static final AngleUnit ANGLE_UNIT = AngleUnit.DEGREES;
-    public static final String NAME = "imu";
 
-    com.qualcomm.robotcore.hardware.IMU imu;
+    public com.qualcomm.robotcore.hardware.IMU imu;
 
-    public IMU(HardwareMap hardwareMap, com.qualcomm.robotcore.hardware.IMU.Parameters parameters) {
+    public IMU(HardwareMap hardwareMap) {
+        com.qualcomm.robotcore.hardware.IMU.Parameters parameters =
+                new com.qualcomm.robotcore.hardware.IMU.Parameters(
+                    new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                        RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
+                ));
 
-        imu = hardwareMap.get(com.qualcomm.robotcore.hardware.IMU.class, NAME);
+        imu = hardwareMap.get(com.qualcomm.robotcore.hardware.IMU.class, Constants.IMU_NAME);
         imu.initialize(parameters);
     }
 
