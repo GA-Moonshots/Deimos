@@ -58,7 +58,6 @@ public class MecanumDrive {
         this.camera = new Camera(opMode.hardwareMap, opMode.telemetry);
         this.opMode = opMode;
 
-
         leftFront = opMode.hardwareMap.get(DcMotor.class, Constants.LEFT_FRONT_NAME);
         rightFront = opMode.hardwareMap.get(DcMotor.class, Constants.RIGHT_FRONT_NAME);
         leftBack = opMode.hardwareMap.get(DcMotor.class, Constants.LEFT_BACK_NAME);
@@ -71,7 +70,7 @@ public class MecanumDrive {
         rearDistance = new DistanceSensor(opMode.hardwareMap, Constants.REAR_DIST_NAME);
         rightDistance = new DistanceSensor(opMode.hardwareMap, Constants.RIGHT_DIST_NAME);
         leftDistance = null; //new DistanceSensor(opMode.hardwareMap, Constants.LEFT_DIST_NAME);
-        this.camera = new Camera(opMode.hardwareMap, telemetry);
+
         fieldCentricTarget = imu.getZAngle();
     }
 

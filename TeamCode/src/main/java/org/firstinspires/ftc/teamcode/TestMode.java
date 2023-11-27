@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.sensors.Camera;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 import org.firstinspires.ftc.teamcode.sensors.PIDController;
@@ -13,10 +14,25 @@ import java.io.IOException;
 
 @TeleOp(name = "Test Mode")
 public class TestMode extends LinearOpMode {
+
+    Camera camera;
     @Override
     public void runOpMode() {
+
+        // LETS PREVENT OUR ROBOT FROM SHUTTING DOWN
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        armTest();
+        camera = new Camera(hardwareMap, telemetry);
+
+        telemetry.addData("Camera:", camera.getStatus());
+        telemetry.update();
+
+        camera.shutdown();
+
+        telemetry.addData("Camera:", camera.getStatus());
+        telemetry.update();
+
+        this.terminateOpModeNow();
+
     }
 
     public void pidTest() {
@@ -50,9 +66,5 @@ public class TestMode extends LinearOpMode {
         drive.stop();
     }
 
-    private void armTest() {
-        Arm arm = new Arm(this);
-
-    }
 
 }

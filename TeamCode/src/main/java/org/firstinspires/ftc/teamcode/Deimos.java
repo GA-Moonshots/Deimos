@@ -48,11 +48,9 @@ public class Deimos extends LinearOpMode {
             telemetry.addData("Camera:", drive.camera.getStatus());
             telemetry.update();
         }
-        // Start (runs once)
-        telemetry.addData("Status", "Started");
-        telemetry.update();
 
         timer.reset();
+        waitForStart();
 
         // ---MAIN EXECUTION LOOP (runs until stop is pressed) --
         while(opModeIsActive()) {
@@ -69,10 +67,6 @@ public class Deimos extends LinearOpMode {
 
             telemetry.update();
         }
-
-        // STOP ALL SYSTEMS AFTER EXECUTION LOOP
-        drive.stop();
-        drive.camera.shutdown();
     }
 
     /**
