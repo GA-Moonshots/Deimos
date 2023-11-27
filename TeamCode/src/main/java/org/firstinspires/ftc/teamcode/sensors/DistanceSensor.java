@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.wrappers;
+package org.firstinspires.ftc.teamcode.sensors;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;

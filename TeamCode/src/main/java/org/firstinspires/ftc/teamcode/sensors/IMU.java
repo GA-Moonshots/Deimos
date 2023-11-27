@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.wrappers;
+package org.firstinspires.ftc.teamcode.sensors;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;

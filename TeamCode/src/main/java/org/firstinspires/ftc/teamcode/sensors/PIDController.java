@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.wrappers;
+package org.firstinspires.ftc.teamcode.sensors;
 
 import android.os.Environment;
 

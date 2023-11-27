@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
-import org.firstinspires.ftc.teamcode.wrappers.PIDController;
+import org.firstinspires.ftc.teamcode.sensors.PIDController;
 
 import java.io.IOException;
 

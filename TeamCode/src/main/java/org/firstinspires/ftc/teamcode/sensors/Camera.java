@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vision;
+package org.firstinspires.ftc.teamcode.sensors;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -46,9 +46,10 @@ public class Camera {
     }
 
     public void shutdown() {
+        visionPortal.getActiveCamera().close();
         visionPortal.close();
-        visionPortal = null;
-        aprilTag = null;
-        System.gc();
+        //visionPortal = null;
+        //aprilTag = null;
+        //System.gc();
     }
 }

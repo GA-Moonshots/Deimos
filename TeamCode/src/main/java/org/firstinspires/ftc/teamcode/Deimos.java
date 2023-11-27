@@ -71,6 +71,8 @@ public class Deimos extends LinearOpMode {
 
         // STOP ALL SYSTEMS AFTER EXECUTION LOOP
         drive.stop();
+        drive.camera.shutdown();
+        sleep(250); // sleep to give the camera time to shutdown
     }
 
     /**
