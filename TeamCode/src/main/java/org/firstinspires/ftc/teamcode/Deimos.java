@@ -45,6 +45,7 @@ public class Deimos extends LinearOpMode {
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
             telemetry.addData("G2LS", "(%f, %f)", gamepad2.left_stick_x, gamepad2.left_stick_y);
             telemetry.addData("G2RS", "(%f, %f)", gamepad2.right_stick_x, gamepad2.right_stick_y);
+            telemetry.addData("Camera:", drive.camera.getStatus());
             telemetry.update();
         }
         // Start (runs once)
@@ -57,14 +58,14 @@ public class Deimos extends LinearOpMode {
         while(opModeIsActive()) {
             telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
-            telemetry.addData("UPS", 1 / (timer.seconds() - lastTime));
-            telemetry.addData("zAngle", drive.imu.getZAngle());
-            lastTime = timer.seconds();
-            //
+            //telemetry.addData("UPS", 1 / (timer.seconds() - lastTime));
+            telemetry.addData("Camera:", drive.camera.getStatus());
+            //lastTime = timer.seconds();
+
             // Driver 1: Responsible for drivetrain and movement
-            driver1Inputs();
+            if(opModeIsActive()) driver1Inputs();
             // Driver 2: Responsible for the subsystem attachment
-            driver2Inputs();
+            if(opModeIsActive()) driver2Inputs();
 
             telemetry.update();
         }
@@ -72,7 +73,6 @@ public class Deimos extends LinearOpMode {
         // STOP ALL SYSTEMS AFTER EXECUTION LOOP
         drive.stop();
         drive.camera.shutdown();
-        sleep(250); // sleep to give the camera time to shutdown
     }
 
     /**

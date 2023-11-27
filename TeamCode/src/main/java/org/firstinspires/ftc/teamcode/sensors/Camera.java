@@ -25,9 +25,11 @@ public class Camera {
                 .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
                 .build();
         WebcamName name = hardwareMap.get(WebcamName.class, Constants.WEBCAM_NAME);
-        visionPortal = new VisionPortal.Builder()
-                .setCamera(name).addProcessor(aprilTag)
-                .build();
+        visionPortal = VisionPortal.easyCreateWithDefaults(name, aprilTag);
+//        visionPortal = new VisionPortal.Builder()
+//                .setCamera(name).addProcessor(aprilTag)
+//                .build();
+        visionPortal.setActiveCamera(name);
     }
 
     public List<AprilTagDetection> getDetections() {
@@ -45,8 +47,12 @@ public class Camera {
         return aprilTag.getDetections();
     }
 
+    public String getStatus(){
+        return visionPortal.getCameraState().toString();
+    }
+
     public void shutdown() {
-        visionPortal.getActiveCamera().close();
+        visionPortal.setProcessorEnabled(aprilTag, false);
         visionPortal.close();
         //visionPortal = null;
         //aprilTag = null;
