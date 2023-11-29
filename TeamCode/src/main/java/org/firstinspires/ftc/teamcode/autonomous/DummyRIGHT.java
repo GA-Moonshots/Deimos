@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Dummy RIGHT")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = ".Dummy RIGHT")
 public class DummyRIGHT extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Left Blue Autonomous")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Blue - LEFT")
 public class LeftBlueAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;
@@ -24,21 +24,16 @@ public class LeftBlueAuto extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new MecanumDrive(this);
         arm = new Arm(this);
-
         waitForStart();
 
-        // approach the prop
+        // approach and face the prop
         drive.fwdFromWall(20);
-
         drive.faceTheProp();
-
         // go robot centric driving
         drive.isFieldCentric = false;
-
         // nudge forward
         drive.nudge(-0.2);
         sleep(100);
-
         // lowers claw and drops pixel
         arm.goToPickUp();
         sleep(1000);
@@ -56,7 +51,6 @@ public class LeftBlueAuto extends LinearOpMode {
 
         // DONE: CLEAN UP
         drive.stop();
-        drive.camera.shutdown();
         this.terminateOpModeNow();
 
     }

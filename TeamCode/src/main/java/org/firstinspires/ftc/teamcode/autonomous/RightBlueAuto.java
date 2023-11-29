@@ -10,7 +10,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Right Blue Autonomous")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Blue - RIGHT")
 public class RightBlueAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;
@@ -55,11 +55,10 @@ public class RightBlueAuto extends LinearOpMode {
 
         drive.fwdFromWall(50);
 
-        drive.backUpUntilAprilTag();
+
 
         // DONE: CLEAN UP
         drive.stop();
-        drive.camera.shutdown();
         this.terminateOpModeNow();
     }
 }

@@ -69,7 +69,7 @@ public class MecanumDrive {
 
         rearDistance = new DistanceSensor(opMode.hardwareMap, Constants.REAR_DIST_NAME);
         rightDistance = new DistanceSensor(opMode.hardwareMap, Constants.RIGHT_DIST_NAME);
-        leftDistance = null; //new DistanceSensor(opMode.hardwareMap, Constants.LEFT_DIST_NAME);
+        leftDistance = new DistanceSensor(opMode.hardwareMap, Constants.LEFT_DIST_NAME);
 
         fieldCentricTarget = imu.getZAngle();
     }
@@ -82,6 +82,12 @@ public class MecanumDrive {
         drive(0.0d, 0.0d, 0.0d, 0.0d);
     }
 
+    /**
+     *
+     * @param forward negative is forward
+     * @param strafe
+     * @param turn positive is clockwise
+     */
     public void drive(double forward, double strafe, double turn) {
 
         // Field Centric adjustment
@@ -213,20 +219,26 @@ public class MecanumDrive {
     }
 
     // ----- TURN COMMANDS -----
+    // ----- TURN COMMANDS -----
+    // ----- TURN COMMANDS -----
 
+    /**
+     * Turn robot relative to current facing
+     * @param target positive 1-180 is left, negative 1-180 is right
+     */
     public void turnRobotByDegree(double target) {
         double targetAngle = imu.getZAngle() + target;
         if(targetAngle > 180) {
             targetAngle -= 360;
         }
+        if(targetAngle < -180) {
+            targetAngle += 360;
+        }
+        int motorSpeed = target > 0 ? -1 : 1;
 
-        while(Math.abs(targetAngle - imu.getZAngle()) >= 1 && opMode.opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance(DistanceUnit.INCH));
-            telemetry.addData("IMU Angle", imu.getZAngle());
-            telemetry.addData("Target", targetAngle);
-            telemetry.update();
-            //drive(0.0, 0.0, Math.toRadians(getIMU().getZAngle()));
-            drive(0,0,-.3);
+        while(Math.abs(targetAngle - imu.getZAngle()) >= 2 && opMode.opModeIsActive()) {
+
+            drive(0,0,0.3 * motorSpeed);
 
         }
         stop();
@@ -235,8 +247,8 @@ public class MecanumDrive {
     /**
      * Rotates robot to its imu's 0 deg heading
      */
-    public void turnToZero(){
-        while(Math.abs(imu.getZAngle()) >= 2 && opMode.opModeIsActive()) {
+    public void turnToZero() {
+        while (Math.abs(imu.getZAngle()) >= 2 && opMode.opModeIsActive()) {
             drive(0.0, 0.0, Math.toRadians(imu.getZAngle()));
         }
         stop();
@@ -258,11 +270,13 @@ public class MecanumDrive {
         turnRobotByDegree(180);
     }
 
-    // ----- STRAFE -----
+    // ----- STRAFE FUNCTIONS -----
+    // ----- STRAFE FUNCTIONS -----
+    // ----- STRAFE FUNCTIONS -----
+
     /**
-     * Strafes until it sees a wall within 5 inches or until 4.75 seconds pass. Positive to the right
-     * and negative to the left.
-     * @param str The distance in inches to the wall
+     * Strafes until it sees a wall within 5 inches or until 4.75 seconds pass
+     * @param str Positive to the right, negative to the left
      */
     public void strafeUntilWall(double str){
         if (str > Constants.MOTOR_MAX_SPEED) str = Constants.MOTOR_MAX_SPEED;
@@ -278,7 +292,9 @@ public class MecanumDrive {
     }
 
 
-    // ----- APRIL TAG -----
+    // ----- APRIL TAG FUNCTIONS -----
+    // ----- APRIL TAG FUNCTIONS -----
+    // ----- APRIL TAG FUNCTIONS -----
 
     /**
      * Positions robot ready to drop pixel

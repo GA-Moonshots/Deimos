@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Left Red Autonomous")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Red - LEFT")
 public class LeftRedAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;

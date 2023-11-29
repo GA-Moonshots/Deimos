@@ -15,21 +15,21 @@ import java.io.IOException;
 @TeleOp(name = "Test Mode")
 public class TestMode extends LinearOpMode {
 
-    Camera camera;
+    MecanumDrive drive;
+
     @Override
     public void runOpMode() {
 
         // LETS PREVENT OUR ROBOT FROM SHUTTING DOWN
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        camera = new Camera(hardwareMap, telemetry);
+        drive = new MecanumDrive(this);
 
-        telemetry.addData("Camera:", camera.getStatus());
-        telemetry.update();
+        while(opModeInInit()) {
+            telemetry.addData("ang", drive.imu.getZAngle());
+            telemetry.update();
+            sleep(25);
+        }
 
-        camera.shutdown();
-
-        telemetry.addData("Camera:", camera.getStatus());
-        telemetry.update();
 
         this.terminateOpModeNow();
 
