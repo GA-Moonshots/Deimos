@@ -166,8 +166,12 @@ public class MecanumDrive {
      * @param distance requested distance in inches
      */
     public void fwdFromWall(double distance){
+       fwdFromWall(distance, 3);
+    }
+
+    public void fwdFromWall(double distance, double time){
         ElapsedTime rt = new ElapsedTime();
-        while(rearDistance.getDistance() <= distance && rt.seconds() <= 3
+        while(rearDistance.getDistance() <= distance && rt.seconds() <= time
                 && opMode.opModeIsActive()) {
             telemetry.addData("Rear Distance", rearDistance.getDistance());
             telemetry.addData("IMU Angle", imu.getZAngle());
@@ -257,15 +261,16 @@ public class MecanumDrive {
     /**
      * Uses distance sensors to scan area for prop and faces the claw in that direction
      */
-    public void faceTheProp(){
+    public void faceTheProp(double str){
         //TODO Use the left and right sensors to determine if it's left, right, or failing those, front
         while(rearDistance.getDistance() >= 8 && opMode.opModeIsActive()) {
             telemetry.addData("Rear Distance", rearDistance.getDistance());
             telemetry.addData("IMU Angle", imu.getZAngle());
             telemetry.update();
-            drive(0.0, 0.0, 0.3);
+            drive(0.0, 0.0, str);
         }
         stop();
+        telemetry.addData("Ed sez", "I saw the prop :) good job wahoo");
 
         turnRobotByDegree(180);
     }
@@ -279,8 +284,8 @@ public class MecanumDrive {
      * @param str Positive to the right, negative to the left
      */
     public void strafeUntilWall(double str){
-        if (str > Constants.MOTOR_MAX_SPEED) str = Constants.MOTOR_MAX_SPEED;
-        if (str < -Constants.MOTOR_MAX_SPEED) str = -Constants.MOTOR_MAX_SPEED;
+        // caping the value  ~ Piccorillo 2023 ~
+        str = Range.clip(str, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED);
 
         // are we going left or right. Use the right sensor
         DistanceSensor ds = str > 0 ? rightDistance : leftDistance;
@@ -506,4 +511,56 @@ public class MecanumDrive {
 
     }
 
+    public enum HowToMove {
+        LEFT,
+        RIGHT,
+        BACK,
+        ROTATE_LEFT,
+        ROTATE_RIGHT
+    }
+
+    /**
+     * Blocking Autonomous drive command, with a maxTime backup system
+     *
+     * @param strength The speed to move at
+     * @param targetDistance The distance (or angle) that the sensor attempts to go to
+     * @param side The sensor (or rotation direction) to listen to and move in
+     * @param maxTime The maximum time in seconds this function is allowed to run for
+     *
+     * @return If this function stopped by distance sensors (true) or by time (false)
+     */
+    public boolean autoDrive(double strength, double targetDistance, HowToMove side, double maxTime) {
+        assert maxTime > 0 && strength > 0 && strength <= 1;
+        ElapsedTime runtime = new ElapsedTime();
+        while(opMode.opModeIsActive() && runtime.seconds() <= maxTime) {
+            switch (side) {
+                case LEFT:
+                    if(Math.abs(leftDistance.getDistance() - targetDistance) <= Constants.DISTANCE_THRESHOLD) {
+                        return true;
+                    } else if(leftDistance.getDistance() > targetDistance) {
+                        drive(0.0d, -strength, 0.0d);
+                    } else {
+                        drive(0.0d, strength, 0.0d);
+                    } break;
+                case RIGHT:
+                    if(Math.abs(rightDistance.getDistance() - targetDistance) <= Constants.DISTANCE_THRESHOLD) {
+                        return true;
+                    } else if(rightDistance.getDistance() > targetDistance) {
+                        drive(0.0d, strength, 0.0d);
+                    } else {
+                        drive(0.0d, -strength, 0.0d);
+                    } break;
+                case BACK:
+                    if(Math.abs(rearDistance.getDistance() - targetDistance) <= Constants.DISTANCE_THRESHOLD) {
+                        return true;
+                    } else if (rearDistance.getDistance() > targetDistance) {
+                        drive(strength, 0.0d, 0.0d);
+                    } else {
+                        drive(-strength, 0.0d, 0.0d);
+                    } break;
+                case ROTATE_LEFT:
+            }
+        }
+        return false;
+    }
 }

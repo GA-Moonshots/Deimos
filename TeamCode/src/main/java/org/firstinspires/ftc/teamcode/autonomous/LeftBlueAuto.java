@@ -28,7 +28,7 @@ public class LeftBlueAuto extends LinearOpMode {
 
         // approach and face the prop
         drive.fwdFromWall(20);
-        drive.faceTheProp();
+        drive.faceTheProp(0.3);
         // go robot centric driving
         drive.isFieldCentric = false;
         // nudge forward

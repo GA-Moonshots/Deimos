@@ -32,7 +32,7 @@ public class RightBlueAuto extends LinearOpMode {
 
         drive.fwdFromWall(20);
 
-        drive.faceTheProp();
+        drive.faceTheProp(-0.3);
 
         // go robot centric driving
         drive.isFieldCentric = false;
@@ -49,11 +49,21 @@ public class RightBlueAuto extends LinearOpMode {
         arm.travelMode();
 
         // get back
-        drive.nudge(0.3);
+        drive.nudge(0.2);
 
         drive.turnToZero();
 
+        drive.isFieldCentric = true;
+
+        // go forward to the middle
+        drive.backUpToWall(4);
+
+        drive.strafeUntilWall(0.2);
+
         drive.fwdFromWall(50);
+
+        drive.strafeUntilWall(-0.7);
+
 
 
 

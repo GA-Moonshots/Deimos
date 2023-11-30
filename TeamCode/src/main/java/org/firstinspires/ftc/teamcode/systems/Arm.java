@@ -5,12 +5,9 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Const;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 
 import java.util.Locale;
@@ -37,7 +34,7 @@ public class Arm {
 
     public Arm(LinearOpMode opMode) {
         this.opMode = opMode;
-        this.motor = opMode.hardwareMap.get(DcMotor.class, Constants.ARM_NAME);
+        this.motor = opMode.hardwareMap.get(DcMotor.class, Constants.ARM_MOTOR_NAME);
         this.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         wristServo = opMode.hardwareMap.get(Servo.class, Constants.WRIST_SERVO_NAME);

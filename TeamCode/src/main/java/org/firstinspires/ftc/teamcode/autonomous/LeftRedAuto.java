@@ -29,11 +29,36 @@ public class LeftRedAuto extends LinearOpMode {
 
         drive.fwdFromWall(20);
 
-        drive.faceTheProp();
+        drive.faceTheProp(0.3);
+
+        drive.isFieldCentric = false;
+        // nudge forward
+        drive.nudge(-0.2);
+        sleep(100);
+        // lowers claw and drops pixel
+        arm.goToPickUp();
+        sleep(1000);
+
+        arm.travelMode();
+
+        // get back
+        drive.nudge(0.3);
+
+        drive.turnToZero();
+
+        drive.isFieldCentric = true;
+
+        drive.backUpToWall(4);
+
+        drive.strafeUntilWall(-0.2);
+
+        drive.fwdFromWall(50, 8);
+
+        drive.strafeUntilWall(0.7);
+
 
         // DONE: CLEAN UP
         drive.stop();
-        drive.camera.shutdown();
         this.terminateOpModeNow();
     }
 }

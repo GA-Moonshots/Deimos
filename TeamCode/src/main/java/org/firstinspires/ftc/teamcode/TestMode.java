@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.sensors.Camera;
+import org.firstinspires.ftc.teamcode.systems.Elevator;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 import org.firstinspires.ftc.teamcode.sensors.PIDController;
@@ -19,6 +20,11 @@ public class TestMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        // Switch this to the test that we want
+        elevatorTest();
+    }
+
+    public void driveTest() {
 
         // LETS PREVENT OUR ROBOT FROM SHUTTING DOWN
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -66,5 +72,14 @@ public class TestMode extends LinearOpMode {
         drive.stop();
     }
 
+    public void elevatorTest() {
+        Elevator elevator = new Elevator(hardwareMap, telemetry);
+        MecanumDrive drive = new MecanumDrive(this);
+        waitForStart();
 
+        while(opModeIsActive()) {
+            elevator.move(gamepad1.right_stick_y);
+            drive.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+        }
+    }
 }

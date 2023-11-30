@@ -30,7 +30,7 @@ public class RightRedAuto extends LinearOpMode {
         // approach the prop
         drive.fwdFromWall(20);
 
-        drive.faceTheProp();
+        drive.faceTheProp(-0.3);
 
         // go robot centric driving
         drive.isFieldCentric = false;
@@ -57,7 +57,5 @@ public class RightRedAuto extends LinearOpMode {
 
         // DONE: CLEAN UP
         drive.stop();
-        drive.camera.shutdown();
-        this.terminateOpModeNow();
     }
 }

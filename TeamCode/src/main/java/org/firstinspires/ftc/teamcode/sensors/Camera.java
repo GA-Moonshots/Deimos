@@ -49,9 +49,4 @@ public class Camera {
     public String getStatus(){
         return visionPortal.getCameraState().toString();
     }
-
-    public void shutdown() {
-        visionPortal.setProcessorEnabled(aprilTag, false);
-        visionPortal.close();
-    }
 }
