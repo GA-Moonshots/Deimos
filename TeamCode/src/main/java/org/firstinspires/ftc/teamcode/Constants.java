@@ -34,6 +34,10 @@ public class Constants {
     // Generalized minimum position difference for the robot to respond to an autonomous movement command
     public static final double DISTANCE_THRESHOLD = 1.0;
 
+    // ELEVATOR
+    public static final double LOCK_OFF_POSITION = 0.0;
+    public static final double LOCK_ON_POSITION = 1.0;
+
     // ----- HARDWARE MAP NAMES ------
     // -------- SENSOR NAMES ---------
     public static final String IMU_NAME = "imu";
@@ -53,4 +57,6 @@ public class Constants {
     public static final String OPEN_SERVO_NAME = "open";
     public static final String ROLL_SERVO_NAME = "roll";
     public static final String RELEASE_SERVO_NAME = "releasePin";
+    public static final String ELEVATOR_LEFT_SERVO_NAME = "elevLeft";
+    public static final String ELEVATOR_RIGHT_SERVO_NAME = "elevRight";
 }

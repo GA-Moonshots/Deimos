@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.systems.Elevator;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
@@ -15,7 +16,8 @@ public class Deimos extends LinearOpMode {
 
     // SUBSYSTEMS
     private Arm arm;
-    private MecanumDrive drive;
+    private MecanumDrive driveyMcDriveDriveDriverson;
+    private Elevator elevator;
 
     // INSTANCE VARIABLES
     private double lastTime = 0.0d;
@@ -30,13 +32,15 @@ public class Deimos extends LinearOpMode {
     private boolean gp2bPressed = false;
     private boolean gp2xPressed = false;
     private boolean gp2yPressed = false;
+    private boolean gp2rbPressed = false;
     
     @Override
     public void runOpMode() {
         // Init (runs once)
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        drive = new MecanumDrive(this);
+        driveyMcDriveDriveDriverson = new MecanumDrive(this);
         arm = new Arm(this);
+        elevator = new Elevator(hardwareMap, telemetry);
 
         // Init Loop (runs until stop button or start button is pressed)
         while(opModeInInit()) {
@@ -45,7 +49,7 @@ public class Deimos extends LinearOpMode {
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
             telemetry.addData("G2LS", "(%f, %f)", gamepad2.left_stick_x, gamepad2.left_stick_y);
             telemetry.addData("G2RS", "(%f, %f)", gamepad2.right_stick_x, gamepad2.right_stick_y);
-            telemetry.addData("Camera:", drive.camera.getStatus());
+            telemetry.addData("Camera:", driveyMcDriveDriveDriverson.camera.getStatus());
             telemetry.update();
         }
 
@@ -57,7 +61,7 @@ public class Deimos extends LinearOpMode {
             telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
             //telemetry.addData("UPS", 1 / (timer.seconds() - lastTime));
-            telemetry.addData("Camera:", drive.camera.getStatus());
+            telemetry.addData("Camera:", driveyMcDriveDriveDriverson.camera.getStatus());
             //lastTime = timer.seconds();
 
             // Driver 1: Responsible for drivetrain and movement
@@ -78,7 +82,7 @@ public class Deimos extends LinearOpMode {
 
         // A BUTTON: toggles field-centric VS robot-centric driving
         if(gamepad1.a && !gp1aPressed && !gamepad1.start) {
-            drive.isFieldCentric = !drive.isFieldCentric;
+            driveyMcDriveDriveDriverson.isFieldCentric = !driveyMcDriveDriveDriverson.isFieldCentric;
         }
         gp1aPressed = gamepad1.a; // this structure avoids double press
 
@@ -114,7 +118,7 @@ public class Deimos extends LinearOpMode {
         // JOYSTICK: motion control - left stick strafes / right stick rotates
         // is the pilot denied control of the robot while we line up to an April tag?
         if(align != MecanumDrive.AprilTagToAlign.NONE) {
-            if(!drive.alignToAprilTag(align)) {
+            if(!driveyMcDriveDriveDriverson.alignToAprilTag(align)) {
                 align = MecanumDrive.AprilTagToAlign.NONE;
             }
         // listen to driver controls
@@ -130,7 +134,7 @@ public class Deimos extends LinearOpMode {
             if (Math.abs(strafe) <= Constants.INPUT_THRESHOLD)  strafe = 0.0d;
             if (Math.abs(turn) <= Constants.INPUT_THRESHOLD) turn = 0.0d;
 
-            drive.drive(forward * speedMod, strafe, turn);
+            driveyMcDriveDriveDriverson.drive(forward * speedMod, strafe, turn);
         }
 
     }
@@ -169,6 +173,11 @@ public class Deimos extends LinearOpMode {
         if(armState != Arm.RunState.NONE)
             return;
 
+        if(gamepad2.right_bumper && !gp2rbPressed) {
+            elevator.toggleLock();
+        }
+        gp2rbPressed = gamepad2.right_bumper;
+
         // DPAD VERTICAL: wrist
         if(gamepad2.dpad_up && !gamepad2.dpad_down) {
             arm.wristUp();
@@ -184,6 +193,7 @@ public class Deimos extends LinearOpMode {
 
         // JOYSTICKS: lift and lower arm
         double armRotate = gamepad2.left_stick_y;
+        double elevatorStr = gamepad2.right_stick_y;
         // DEAD-ZONE
         if(Math.abs(armRotate) <= Constants.INPUT_THRESHOLD) armRotate = 0;
         // Offsets
@@ -193,6 +203,8 @@ public class Deimos extends LinearOpMode {
             arm.changeOffset(-5);
         arm.move(armRotate);
 
+        if(Math.abs(elevatorStr) <= Constants.INPUT_THRESHOLD) elevatorStr = 0;
+        elevator.move(elevatorStr);
     }
 
 }

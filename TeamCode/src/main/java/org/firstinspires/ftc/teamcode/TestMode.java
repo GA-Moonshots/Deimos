@@ -77,9 +77,14 @@ public class TestMode extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(this);
         waitForStart();
 
+        boolean b = false;
+
         while(opModeIsActive()) {
             elevator.move(gamepad1.right_stick_y);
             drive.drive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+            if(gamepad1.b && !b && !gamepad1.start)
+                elevator.toggleLock();
+            b = gamepad1.b;
         }
     }
 }
