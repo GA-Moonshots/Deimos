@@ -25,6 +25,9 @@ public class RightRedAuto extends LinearOpMode {
         drive = new MecanumDrive(this);
         arm = new Arm(this);
 
+        while(opModeInInit())
+            drive.getSensorReadout();
+
         waitForStart();
 
         // approach the prop

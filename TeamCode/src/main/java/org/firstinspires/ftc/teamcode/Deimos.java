@@ -170,8 +170,15 @@ public class Deimos extends LinearOpMode {
             armState = Arm.RunState.NONE;
         gp2yPressed = gamepad2.y;
 
-        if(armState != Arm.RunState.NONE)
+        if(armState == Arm.RunState.GOTO_DROPOFF) {
+            if (arm.goToDropOff())
+                armState = Arm.RunState.NONE;
             return;
+        } else if(armState == Arm.RunState.GOTO_GROUND) {
+            if (arm.goToPickUp())
+                armState = Arm.RunState.NONE;
+            return;
+        }
 
         if(gamepad2.right_bumper && !gp2rbPressed) {
             elevator.toggleLock();

@@ -28,6 +28,9 @@ public class RightBlueAuto extends LinearOpMode {
         drive = new MecanumDrive(this);
         arm = new Arm(this);
 
+        while(opModeInInit())
+            drive.getSensorReadout();
+
         waitForStart();
 
         drive.fwdFromWall(20);

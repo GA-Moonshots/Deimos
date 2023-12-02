@@ -37,6 +37,7 @@ public class Constants {
     // ELEVATOR
     public static final double LOCK_OFF_POSITION = 0.0;
     public static final double LOCK_ON_POSITION = 1.0;
+    public static final double ELEVATOR_MAX_SPEED = 0.9;
 
     // ----- HARDWARE MAP NAMES ------
     // -------- SENSOR NAMES ---------

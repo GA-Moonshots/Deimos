@@ -563,4 +563,11 @@ public class MecanumDrive {
         }
         return false;
     }
+
+    public void getSensorReadout() {
+        telemetry.addData("Left Distance", leftDistance.getDistance());
+        telemetry.addData("Right Distance", rightDistance.getDistance());
+        telemetry.addData("Rear Distance", rearDistance.getDistance());
+        telemetry.update();
+    }
 }

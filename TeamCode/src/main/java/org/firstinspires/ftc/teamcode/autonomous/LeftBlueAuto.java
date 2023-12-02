@@ -24,6 +24,10 @@ public class LeftBlueAuto extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new MecanumDrive(this);
         arm = new Arm(this);
+
+        while(opModeInInit())
+            drive.getSensorReadout();
+
         waitForStart();
 
         // approach and face the prop

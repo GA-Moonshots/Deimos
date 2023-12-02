@@ -46,6 +46,7 @@ public class Arm {
     }
 
     public void move(double shoulderRot){
+        opMode.telemetry.addData("Arm", motor.getCurrentPosition());
         if(opMode.telemetry != null) {
             opMode.telemetry.addData("Shoulder Pos", motor.getCurrentPosition());
             opMode.telemetry.addData("Shoulder Power", motor.getPower());
@@ -59,10 +60,11 @@ public class Arm {
             motor.setPower(0);
     }
 
-    public void goToPickUp() {
+    public boolean goToPickUp() {
         // ongoing motion check... should it continue moving?
         if(motor.getCurrentPosition() + offset <= Constants.ARM_DOWN_POSITION)
             motor.setPower(Constants.ARM_MOTOR_STRENGTH);
+        else return true;
         // Encoder values go down as arm goes up
         // -1400 + x >= -400
         // offset corrects encoder "walk"
@@ -73,12 +75,14 @@ public class Arm {
             wristAng = Constants.WRIST_ON_GROUND;
         }
         open();
+        return false;
     }
 
-    public void goToDropOff() {
+    public boolean goToDropOff() {
         close();
-        if(motor.getCurrentPosition() + offset >= Constants.ARM_UP_POSITION)
+        if(motor.getCurrentPosition() + offset >= Constants.ARM_UP_POSITION) {
             motor.setPower(-Constants.ARM_MOTOR_STRENGTH);
+        } else return true;
         // Encoder values go down as arm goes up
         if(motor.getCurrentPosition() + offset <= -400){
             rollServo.setPosition(Constants.ROLL_MIN);
@@ -86,6 +90,7 @@ public class Arm {
             wristServo.setPosition(Constants.WRIST_ON_WALL);
             wristAng = Constants.WRIST_ON_WALL;
         }
+        return false;
     }
 
     public void travelMode() {
