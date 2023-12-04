@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Red - LEFT")
-public class LeftRedAuto extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Blue - LEFT")
+public class BlueLeftAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;
     private Arm arm;
@@ -30,20 +30,36 @@ public class LeftRedAuto extends LinearOpMode {
 
         waitForStart();
 
+        // approach the prop
         drive.gotoBackDistance(22);
-        drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
+        drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
+
+        // suddenly realize we shouldn't be compensating for a driver's joystick
         drive.makeRobotCentric();
-        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+
+        // nudge the pixel and hope it gets onto the line
+        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+
+        // double open claw and take a half a second to pray
         arm.goToPickUp();
-        // Ensure the arm opens
         arm.open();
         sleep(500);
-        // Second Pixel Logic?
+
+        // lift claw and scoot back
         arm.travelMode();
-        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+
+        // straighten out
         drive.goToZero();
+
+        // engage complexity
         drive.makeFieldCentric();
+
+        // back to wall
         drive.gotoBackDistance(4);
-        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.LEFT, 4.75);
+
+        // park for five points
+        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.LEFT, 5.5);
+
     }
 }

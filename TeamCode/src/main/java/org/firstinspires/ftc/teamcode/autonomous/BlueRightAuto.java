@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Red - RIGHT")
-public class RightRedAuto extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Blue - RIGHT")
+public class BlueRightAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;
     private Arm arm;
@@ -30,27 +30,33 @@ public class RightRedAuto extends LinearOpMode {
 
         waitForStart();
 
+        // approach prop
         drive.gotoBackDistance(22);
-        drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
+        drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
+
+        // temporarily engage sensible logic
         drive.makeRobotCentric();
+
+        // nudge the pixel forward and hope for the best
         drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+
+        // lift the claw x2
         arm.goToPickUp();
-        // Ensure the arm opens
         arm.open();
-        sleep(500);
-        // Second Pixel Logic?
+        sleep(500); // Ensure the arm opens
+
         arm.travelMode();
         drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
         drive.goToZero();
+
+        // could we keep autonomous robot-centric? Sure, but higher risk is higher fun
         drive.makeFieldCentric();
 
-        // go forward to the middle
+        // JOURNEY AROUND THE HUNKS OF METAL TO PARK
         drive.gotoBackDistance(4);
-        drive.autoGoToPosition(0.2, 5, MecanumDrive.HowToMove.LEFT, 5);
+        drive.autoGoToPosition(0.2, 5, MecanumDrive.HowToMove.RIGHT, 5);
         drive.gotoBackDistance(50, 5);
-        drive.autoGoToPosition(0.7, 5, MecanumDrive.HowToMove.RIGHT, 5);
+        drive.autoGoToPosition(0.7, 5, MecanumDrive.HowToMove.LEFT, 5);
 
-        // DONE: CLEAN UP
-        drive.stop();
     }
 }

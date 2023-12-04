@@ -322,9 +322,9 @@ public class MecanumDrive {
     }
 
     public void getSensorReadout() {
-        telemetry.addData("Left Distance", leftDistance.getDistance());
-        telemetry.addData("Right Distance", rightDistance.getDistance());
-        telemetry.addData("Rear Distance", rearDistance.getDistance());
+        telemetry.addData("Left Dist", leftDistance.getDistance());
+        telemetry.addData("Right Dist", rightDistance.getDistance());
+        telemetry.addData("Rear Dist", rearDistance.getDistance());
     }
 
     public void gotoBackDistance(double str, double target, double maxTime) {

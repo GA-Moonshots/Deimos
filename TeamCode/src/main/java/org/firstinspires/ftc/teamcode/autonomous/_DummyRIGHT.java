@@ -5,17 +5,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = ".Dummy LEFT")
-public class DummyLEFT extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = ".Dummy RIGHT")
+public class _DummyRIGHT extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+
         MecanumDrive drive = new MecanumDrive(this);
 
+        drive.makeRobotCentric();
+
         waitForStart();
+
+        //TODO: use a drivetrain method
         ElapsedTime rt = new ElapsedTime();
-        //TODO: Use a drivetrain method
         if(opModeIsActive())
-            drive.drive(0.0, -0.3, 0.0);
+            drive.drive(0.0, 0.3, 0.0);
         while(opModeIsActive() && rt.seconds() <= 5)
             sleep(1);
 

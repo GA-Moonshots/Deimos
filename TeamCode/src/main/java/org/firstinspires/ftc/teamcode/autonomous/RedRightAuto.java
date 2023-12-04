@@ -6,12 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-import java.util.List;
-
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Blue - RIGHT")
-public class RightBlueAuto extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Red - RIGHT")
+public class RedRightAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;
     private Arm arm;
@@ -33,27 +30,35 @@ public class RightBlueAuto extends LinearOpMode {
 
         waitForStart();
 
+        // approach the props
         drive.gotoBackDistance(22);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
+
+        // because of reasons
         drive.makeRobotCentric();
+
+        // nudge the piece and hope we get it on the line for 20 points
         drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+
+        // place the pixel with a couple of redundant commands
         arm.goToPickUp();
-        // Ensure the arm opens
         arm.open();
-        sleep(500);
-        // Second Pixel Logic?
+        sleep(500); // Ensure the arm opens
         arm.travelMode();
+
+        // scoot back
         drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+
+        // straighten out
         drive.goToZero();
+
+        // entirely avoidable added complication again
         drive.makeFieldCentric();
 
-        // go forward to the middle
+        // back up to the wall
         drive.gotoBackDistance(4);
-        drive.autoGoToPosition(0.2, 5, MecanumDrive.HowToMove.RIGHT, 5);
-        drive.gotoBackDistance(50, 5);
-        drive.autoGoToPosition(0.7, 5, MecanumDrive.HowToMove.LEFT, 5);
 
-        // DONE: CLEAN UP
-        drive.stop();
+        // park for 5 points
+        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.RIGHT, 4.75);
     }
 }
