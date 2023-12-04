@@ -1,21 +1,35 @@
 package org.firstinspires.ftc.teamcode.systems;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.sensors.IMU;
 import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
 import org.firstinspires.ftc.teamcode.sensors.Camera;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import java.util.List;
 
 public class MecanumDrive {
+    // USEFUL ENUMS
+    public enum AprilTagToAlign {
+        LEFT,
+        CENTER,
+        RIGHT,
+        NONE
+    }
+
+    public enum HowToMove {
+        LEFT,
+        RIGHT,
+        BACK,
+        ROTATE_LEFT,
+        ROTATE_RIGHT
+    }
+
     // MOTORS
     private final DcMotor leftFront;
     private final DcMotor rightFront;
@@ -36,23 +50,12 @@ public class MecanumDrive {
     private double lastAprilTagYaw = 0.0d;
     private double lastAprilTagStrafe = 0.0d;
     private double fieldCentricTarget = 0.0d;
-    public boolean isFieldCentric = true;
+    private boolean isFieldCentric = true;
     private boolean isGyroLocked = false;
     private boolean isTargetSet = false;
-    public enum AprilTagToAlign {
-        LEFT,
-        CENTER,
-        RIGHT,
-        NONE
-    }
 
-    /**
-     * This constructor takes a reference to the aggregate object that owns it. It's a controversial
-     * design decision and one that can be avoided with a command scheduler
-     * @param opMode
-     */
-    public MecanumDrive(LinearOpMode opMode) {
 
+    public MecanumDrive(@NonNull LinearOpMode opMode) {
         this.imu = new IMU(opMode.hardwareMap);
         this.telemetry = opMode.telemetry;
         this.camera = new Camera(opMode.hardwareMap, opMode.telemetry);
@@ -72,6 +75,18 @@ public class MecanumDrive {
         leftDistance = new DistanceSensor(opMode.hardwareMap, Constants.LEFT_DIST_NAME);
 
         fieldCentricTarget = imu.getZAngle();
+    }
+    // ------ STATE COMMANDS -------
+    public void makeRobotCentric() {
+        isFieldCentric = false;
+    }
+
+    public void makeFieldCentric() {
+        isFieldCentric = true;
+    }
+
+    public void toggleFieldCentric() {
+        isFieldCentric = !isFieldCentric;
     }
 
     // ---- CORE DRIVE COMMANDS ----
@@ -158,416 +173,169 @@ public class MecanumDrive {
         rightBack.setPower(Range.clip(m4, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED));
     }
 
-    // ----- FWD AND BACKWARD -----
+    public void autoDriveByTime(double forward, double strafe, double turn, double time) {
+        assert forward >= -1 && forward <= 1 && strafe >= -1 && strafe <= 1 && turn >= -1 && turn <= 1 && time > 0;
 
-    /**
-     * Drives away from wall until rear sensor reaches the requested distance or until 3 seconds
-     * have passed
-     * @param distance requested distance in inches
-     */
-    public void fwdFromWall(double distance){
-       fwdFromWall(distance, 3);
+        ElapsedTime rt = new ElapsedTime();
+        while(opMode.opModeIsActive() && rt.seconds() <= time) {
+            drive(forward, strafe, turn);
+        }
+        stop();
     }
 
-    public void fwdFromWall(double distance, double time){
+    /**
+     * Blocking Autonomous drive command, with a maxTime backup system
+     *
+     * @param strength The speed to move at. This should always be positive
+     * @param target The distance (or angle) that the sensor attempts to go to
+     * @param side The sensor (or rotation direction) to listen to and move in
+     * @param maxTime The maximum time in seconds this function is allowed to run for
+     *
+     * @return If this function stopped by distance sensors (true) or by time (false)
+     */
+    public void autoGoToPosition(double strength, double target, HowToMove side, double maxTime) {
+        assert maxTime > 0 && strength > 0 && strength <= 1;
+        ElapsedTime runtime = new ElapsedTime();
+        while(opMode.opModeIsActive() && runtime.seconds() <= maxTime) {
+            switch (side) {
+                case LEFT:
+                    if(autoStrafeBySensor(leftDistance, strength, target)) {
+                        stop();
+                        return;
+                    }
+                    break;
+                case RIGHT:
+                    if(autoStrafeBySensor(rightDistance, -strength, target)) {
+                        stop();
+                        return;
+                    }
+                    break;
+                case BACK:
+                    if(autoForwardBySensor(rearDistance, strength, target)) {
+                        stop();
+                        return;
+                    }
+                    break;
+                case ROTATE_LEFT:
+                    if(autoTurn(-strength, target)) {
+                        stop();
+                        return;
+                    }
+                    break;
+                case ROTATE_RIGHT:
+                    if(autoTurn(strength, target)) {
+                        stop();
+                        return;
+                    }
+                    break;
+            }
+        }
+        stop();
+    }
+
+    protected boolean autoStrafeBySensor(DistanceSensor sensor, double strength, double target) {
+        // Check if we finished the step
+        if(Math.abs(sensor.getDistance() - target) <= Constants.DISTANCE_THRESHOLD) {
+            stop();
+            return true;
+        }
+
+        // Continue the step
+        if(sensor.getDistance() > target) {
+            drive(0.0d, -strength, 0.0d);
+        } else {
+            drive(0.0d, strength, 0.0d);
+        }
+        return false;
+    }
+
+    protected boolean autoForwardBySensor(DistanceSensor sensor, double strength, double target) {
+        if(Math.abs(sensor.getDistance() - target) <= Constants.DISTANCE_THRESHOLD) {
+            stop();
+            return true;
+        }
+
+        if(sensor.getDistance() > target) {
+            drive(strength, 0.0d, 0.0d);
+        } else {
+            drive(-strength, 0.0d, 0.0d);
+        }
+        return false;
+    }
+
+    protected boolean autoTurn(double strength, double target) {
+        // Wrap target
+        target %= 360;
+
+        if(Math.abs(imu.getZAngle() - target) <= Constants.ANGLE_THRESHOLD) {
+            stop();
+            return true;
+        }
+
+        drive(0.0d, 0.0d, strength);
+        return false;
+    }
+
+    public void faceTheProp(double str, HowToMove movement, double maxTime){
+        assert (str > 0 && str <= 1) && (movement == HowToMove.ROTATE_LEFT || movement == HowToMove.ROTATE_RIGHT);
+
+        // Set the power value to the correct mode
+        double realStr = movement == HowToMove.ROTATE_LEFT ? -str : str;
+        // Add timing? May not be required for this function
         ElapsedTime rt = new ElapsedTime();
-        while(rearDistance.getDistance() <= distance && rt.seconds() <= time
-                && opMode.opModeIsActive()) {
+        //TODO: Use the left and right sensors to determine if it's left, right, or failing those, front
+        while(rearDistance.getDistance() >= 8 && opMode.opModeIsActive() && rt.seconds() <= maxTime) {
             telemetry.addData("Rear Distance", rearDistance.getDistance());
             telemetry.addData("IMU Angle", imu.getZAngle());
             telemetry.update();
-            drive(-0.3, 0.0, 0.0);
+            drive(0.0, 0.0, realStr);
         }
         stop();
-    }
 
-    /**
-     * @param time seconds to drive
-     * @param str negative is fwd
-     */
-    public void fwdByTime(double time, double str){
-        if (str > Constants.MOTOR_MAX_SPEED) str = Constants.MOTOR_MAX_SPEED;
-        if (str < -Constants.MOTOR_MAX_SPEED) str = -Constants.MOTOR_MAX_SPEED;
-        ElapsedTime rt = new ElapsedTime();
-        while(rt.seconds() <= time && opMode.opModeIsActive()) {
-            drive(str, 0.0, 0.0);
-        }
-        stop();
-    }
 
-    /**
-     * Drive forward or backward for half a second
-     * @param str negative is fwd
-     */
-    public void nudge(double str) {
-        if (str > Constants.MOTOR_MAX_SPEED) str = Constants.MOTOR_MAX_SPEED;
-        if (str < -Constants.MOTOR_MAX_SPEED) str = -Constants.MOTOR_MAX_SPEED;
-        ElapsedTime rt = new ElapsedTime();
-        while(rt.seconds() < 0.5 && opMode.opModeIsActive())
-            drive(str, 0.0, 0.0);
-        stop();
-    }
+        telemetry.addData("Ed sez", "I saw the prop :) good job wahoo");
+        telemetry.update();
 
-    /**
-     * Reverses the robot until it reaches the requested distance
-     * @param distance requested distance in inches
-     */
-    public void backUpToWall(double distance){
-        while(rearDistance.getDistance() >= distance && opMode.opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance());
-            telemetry.addData("IMU Angle", imu.getZAngle());
-            telemetry.update();
-            drive(0.3, 0.0, 0.0);
-        }
-        stop();
-    }
-
-    // ----- TURN COMMANDS -----
-    // ----- TURN COMMANDS -----
-    // ----- TURN COMMANDS -----
-
-    /**
-     * Turn robot relative to current facing
-     * @param target positive 1-180 is left, negative 1-180 is right
-     */
-    public void turnRobotByDegree(double target) {
-        double targetAngle = imu.getZAngle() + target;
+        // Find the new target angle to go to
+        double targetAngle = (imu.getZAngle() - fieldCentricTarget + 180) % 360;
         if(targetAngle > 180) {
             targetAngle -= 360;
         }
         if(targetAngle < -180) {
             targetAngle += 360;
         }
-        int motorSpeed = target > 0 ? -1 : 1;
 
-        while(Math.abs(targetAngle - imu.getZAngle()) >= 2 && opMode.opModeIsActive()) {
+        // Rotate the opposite way
+        HowToMove newMovement = (movement == HowToMove.ROTATE_LEFT) ? HowToMove.ROTATE_LEFT : HowToMove.ROTATE_RIGHT;
 
-            drive(0,0,0.3 * motorSpeed);
-
-        }
-        stop();
+        autoGoToPosition(str, targetAngle, newMovement, maxTime);
     }
 
     /**
      * Rotates robot to its imu's 0 deg heading
      */
-    public void turnToZero() {
-        while (Math.abs(imu.getZAngle()) >= 2 && opMode.opModeIsActive()) {
-            drive(0.0, 0.0, Math.toRadians(imu.getZAngle()));
+    public void goToZero() {
+        while (Math.abs(imu.getZAngle() - fieldCentricTarget) >= 2 && opMode.opModeIsActive()) {
+            drive(0.0, 0.0, Math.toRadians(imu.getZAngle() - fieldCentricTarget));
         }
         stop();
-    }
-
-    /**
-     * Uses distance sensors to scan area for prop and faces the claw in that direction
-     */
-    public void faceTheProp(double str){
-        //TODO Use the left and right sensors to determine if it's left, right, or failing those, front
-        while(rearDistance.getDistance() >= 8 && opMode.opModeIsActive()) {
-            telemetry.addData("Rear Distance", rearDistance.getDistance());
-            telemetry.addData("IMU Angle", imu.getZAngle());
-            telemetry.update();
-            drive(0.0, 0.0, str);
-        }
-        stop();
-        telemetry.addData("Ed sez", "I saw the prop :) good job wahoo");
-
-        turnRobotByDegree(180);
-    }
-
-    // ----- STRAFE FUNCTIONS -----
-    // ----- STRAFE FUNCTIONS -----
-    // ----- STRAFE FUNCTIONS -----
-
-    /**
-     * Strafes until it sees a wall within 5 inches or until 4.75 seconds pass
-     * @param str Positive to the right, negative to the left
-     */
-    public void strafeUntilWall(double str){
-        // caping the value  ~ Piccorillo 2023 ~
-        str = Range.clip(str, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED);
-
-        // are we going left or right. Use the right sensor
-        DistanceSensor ds = str > 0 ? rightDistance : leftDistance;
-        ElapsedTime rt = new ElapsedTime();
-        while(ds.getDistance(DistanceUnit.INCH) >= 5 && rt.seconds() <= 4.75 && opMode.opModeIsActive()) {
-            drive(0, str,0);
-        }
-        stop();
-    }
-
-
-    // ----- APRIL TAG FUNCTIONS -----
-    // ----- APRIL TAG FUNCTIONS -----
-    // ----- APRIL TAG FUNCTIONS -----
-
-    /**
-     * Positions robot ready to drop pixel
-     * @param alignment target to align to based on randomized field config
-     * @return
-     */
-    public boolean alignToAprilTag(AprilTagToAlign alignment) {
-        if(telemetry != null) {
-            switch (alignment) {
-                case LEFT: telemetry.addData("Aligning To", "Left"); break;
-                case CENTER: telemetry.addData("Aligning To", "Center"); break;
-                case RIGHT: telemetry.addData("Aligning To", "Right"); break;
-            }
-        }
-
-        List<AprilTagDetection> detections = camera.getDetections();
-
-        // Ensure that there is at least one detection
-        if(detections.size() == 0) {
-            if(telemetry != null)
-                telemetry.addData("Detections", "Did not find a tag");
-            // Use the last stored values
-            drive(0.0d,
-                    Range.clip((-lastAprilTagStrafe) / Constants.APRIL_TAG_PRECISION,
-                            -Constants.APRIL_TAG_MAX_SPEED, Constants.APRIL_TAG_MAX_SPEED),
-                    0.0d
-            );
-            return lastAprilTagStrafe <= Constants.INPUT_THRESHOLD;
-        }
-        AprilTagDetection activeDetection = null;
-
-        // check turning before everything else, since the detections.size() == 0 check will ensure it stays in line
-        // Any detection will work for this part
-        if(detections.get(0).ftcPose.yaw <= Constants.ANGLE_THRESHOLD) {
-            drive(0.0d, 0.0d,
-                    Range.clip(-Math.toRadians(detections.get(0).ftcPose.yaw),
-                            -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED)
-            );
-            // Every time we have an april tag we should set this to ensure we remember where we are
-            lastAprilTagStrafe = activeDetection.ftcPose.x;
-            lastAprilTagYaw = activeDetection.ftcPose.yaw;
-            return true;
-        }
-        // We have now ensured we are at the correct angle
-
-        // Find case for if we have the correct detection
-        for(AprilTagDetection detection : detections) {
-            if(detection.metadata != null)
-                switch (alignment) {
-                    case LEFT:
-                        if (detection.metadata.name.toLowerCase().contains("left")) {
-                            activeDetection = detection;
-                        }
-                        break;
-                    case CENTER:
-                        if (detection.metadata.name.toLowerCase().contains("center")) {
-                            activeDetection = detection;
-                        }
-                        break;
-                    case RIGHT:
-                        if (detection.metadata.name.toLowerCase().contains("right")) {
-                            activeDetection = detection;
-                        }
-                        break;
-                }
-        }
-
-        // if previous case does not find correct tag
-        if(activeDetection == null) {
-            if(telemetry != null)
-                telemetry.addData("Detections", "Found wrong tag");
-            activeDetection = detections.get(0);
-            switch (alignment) {
-                case LEFT:
-                    drive(0, Constants.APRIL_TAG_MAX_SPEED, 0);
-                    break;
-
-                case RIGHT:
-                    drive(0, -Constants.APRIL_TAG_MAX_SPEED, 0 );
-                    break;
-
-                case CENTER:
-                    if(activeDetection.metadata.name.toLowerCase().contains("left"))
-                        drive(0,-Constants.APRIL_TAG_MAX_SPEED, 0);
-
-                    else
-                        drive(0, Constants.APRIL_TAG_MAX_SPEED, 0);
-                    break;
-            }
-            // Every time we have an april tag we should set this to ensure we remember where we are
-            lastAprilTagStrafe = activeDetection.ftcPose.x;
-            lastAprilTagYaw = activeDetection.ftcPose.yaw;
-
-            return true;
-        }
-
-        // We have now ensured that activeDetection represents the tag we are looking for
-        if(telemetry != null)
-            telemetry.addData("Detections", "Found correct tag");
-        stop();
-        // Every time we have an april tag we should set this to ensure we remember where we are
-        lastAprilTagStrafe = activeDetection.ftcPose.x;
-        lastAprilTagYaw = activeDetection.ftcPose.yaw;
-        return true;
-    }
-
-    public void backUpUntilAprilTag(){
-        while(camera.getDetections().size() == 0 && opMode.opModeIsActive()) {
-            drive(-0.2, 0.0, 0.0);
-        }
-        stop();
-    }
-
-    /**
-     * For reference
-     * @param alignment the AprilTagToAlign
-     * @return true if this method can be called again without adjustment
-     */
-    public boolean oldAlignToAprilTag(AprilTagToAlign alignment) {
-        switch (alignment) {
-            case LEFT: telemetry.addData("Aligning To", "Left"); break;
-            case CENTER: telemetry.addData("Aligning To", "Center"); break;
-            case RIGHT: telemetry.addData("Aligning To", "Right"); break;
-        }
-        // Get AprilTags
-        List<AprilTagDetection> detections = camera.getDetections();
-        if(detections.size() == 0) {
-            telemetry.addData("Detections", "No AprilTags found");
-            return false;
-        }
-
-        AprilTagDetection activeDetection = null;
-        telemetry.addData("Detections", detections.size());
-        // IDENTIFY THE INTENDED TAG
-        for(AprilTagDetection detection : detections) {
-            if(detection.metadata != null)
-                switch (alignment) {
-                    case LEFT:
-                        if (detection.metadata.name.toLowerCase().contains("left")) {
-                            activeDetection = detection;
-                        }
-                        break;
-                    case CENTER:
-                        if (detection.metadata.name.toLowerCase().contains("center")) {
-                            activeDetection = detection;
-                        }
-                        break;
-                    case RIGHT:
-                        if (detection.metadata.name.toLowerCase().contains("right")) {
-                            activeDetection = detection;
-                        }
-                        break;
-                }
-        }
-        // IF UNABLE TO FIND INTENDED TAG
-        if(activeDetection == null) {
-            activeDetection = detections.get(0);
-            switch (alignment) {
-                case LEFT:
-                    drive(0, Constants.APRIL_TAG_MAX_SPEED, 0);
-                    break;
-
-                case RIGHT:
-                    drive(0, -Constants.APRIL_TAG_MAX_SPEED, 0 );
-                    break;
-
-                case CENTER:
-                    if(activeDetection.metadata.name.toLowerCase().contains("left"))
-                        drive(0,-Constants.APRIL_TAG_MAX_SPEED, 0);
-
-                    else
-                        drive(0, Constants.APRIL_TAG_MAX_SPEED, 0);
-                    break;
-            }
-            return true;
-        }
-        telemetry.addData("Tracking XYZ", "(%.2f, %.2f, %.2f)",
-                activeDetection.ftcPose.x, activeDetection.ftcPose.y, activeDetection.ftcPose.z);
-        telemetry.addData("Tracking YPR", "(%.2f, %.2f, %.2f)",
-                activeDetection.ftcPose.yaw, activeDetection.ftcPose.pitch, activeDetection.ftcPose.roll);
-
-        // According to the alignment, we need to find if one of the tags is the correct one,
-        // or if we have to adjust to find it.
-        double turn = Range.clip((-activeDetection.ftcPose.yaw / Constants.APRIL_TAG_PRECISION),
-                -Constants.APRIL_TAG_MAX_SPEED, Constants.APRIL_TAG_MAX_SPEED);
-        telemetry.addData("Position", "Finalizing");
-        // TODO: If we keep headbutting the board, insert a distance sensor check here and override the below forward calculation
-        double forward = 0; //Range.clip((activeDetection.ftcPose.y - APRIL_TAG_DISTANCE_TARGET) / APRIL_TAG_PRECISION, -APRIL_TAG_MAX_SPEED, APRIL_TAG_MAX_SPEED);
-        // Reversed since the camera is on the back of the robot
-        double strafe = Range.clip((-activeDetection.ftcPose.x) / Constants.APRIL_TAG_PRECISION,
-                -Constants.APRIL_TAG_MAX_SPEED, Constants.APRIL_TAG_MAX_SPEED);
-
-        if (
-                Math.abs(forward) <= Constants.INPUT_THRESHOLD &&
-                        Math.abs(strafe) <= Constants.INPUT_THRESHOLD &&
-                        Math.abs(turn) <= Constants.INPUT_THRESHOLD
-        ) {
-            stop();
-            telemetry.addData("Movement", "Done");
-            return false;
-        }
-
-        telemetry.addData("Movement", "(%.2f, %.2f, %.2f)",
-                forward, strafe, turn);
-
-        drive(forward, strafe, turn);
-
-        return detections.size() != 0;
-
-    }
-
-    public enum HowToMove {
-        LEFT,
-        RIGHT,
-        BACK,
-        ROTATE_LEFT,
-        ROTATE_RIGHT
-    }
-
-    /**
-     * Blocking Autonomous drive command, with a maxTime backup system
-     *
-     * @param strength The speed to move at
-     * @param targetDistance The distance (or angle) that the sensor attempts to go to
-     * @param side The sensor (or rotation direction) to listen to and move in
-     * @param maxTime The maximum time in seconds this function is allowed to run for
-     *
-     * @return If this function stopped by distance sensors (true) or by time (false)
-     */
-    public boolean autoDrive(double strength, double targetDistance, HowToMove side, double maxTime) {
-        assert maxTime > 0 && strength > 0 && strength <= 1;
-        ElapsedTime runtime = new ElapsedTime();
-        while(opMode.opModeIsActive() && runtime.seconds() <= maxTime) {
-            switch (side) {
-                case LEFT:
-                    if(Math.abs(leftDistance.getDistance() - targetDistance) <= Constants.DISTANCE_THRESHOLD) {
-                        return true;
-                    } else if(leftDistance.getDistance() > targetDistance) {
-                        drive(0.0d, -strength, 0.0d);
-                    } else {
-                        drive(0.0d, strength, 0.0d);
-                    } break;
-                case RIGHT:
-                    if(Math.abs(rightDistance.getDistance() - targetDistance) <= Constants.DISTANCE_THRESHOLD) {
-                        return true;
-                    } else if(rightDistance.getDistance() > targetDistance) {
-                        drive(0.0d, strength, 0.0d);
-                    } else {
-                        drive(0.0d, -strength, 0.0d);
-                    } break;
-                case BACK:
-                    if(Math.abs(rearDistance.getDistance() - targetDistance) <= Constants.DISTANCE_THRESHOLD) {
-                        return true;
-                    } else if (rearDistance.getDistance() > targetDistance) {
-                        drive(strength, 0.0d, 0.0d);
-                    } else {
-                        drive(-strength, 0.0d, 0.0d);
-                    } break;
-                case ROTATE_LEFT:
-            }
-        }
-        return false;
     }
 
     public void getSensorReadout() {
         telemetry.addData("Left Distance", leftDistance.getDistance());
         telemetry.addData("Right Distance", rightDistance.getDistance());
         telemetry.addData("Rear Distance", rearDistance.getDistance());
-        telemetry.update();
+    }
+
+    public void gotoBackDistance(double str, double target, double maxTime) {
+        autoGoToPosition(str, target, HowToMove.BACK, maxTime);
+    }
+
+    public void gotoBackDistance(double target, double maxTime) {
+        gotoBackDistance(0.3, target, maxTime);
+    }
+
+    public void gotoBackDistance(double target) {
+        gotoBackDistance( target, 3);
     }
 }

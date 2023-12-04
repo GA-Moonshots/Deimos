@@ -12,7 +12,7 @@ public class DummyRIGHT extends LinearOpMode {
 
         MecanumDrive drive = new MecanumDrive(this);
 
-        drive.isFieldCentric = false;
+        drive.makeRobotCentric();
 
         waitForStart();
 

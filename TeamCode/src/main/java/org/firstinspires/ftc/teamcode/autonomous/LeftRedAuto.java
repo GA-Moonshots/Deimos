@@ -30,38 +30,20 @@ public class LeftRedAuto extends LinearOpMode {
 
         waitForStart();
 
-        drive.fwdFromWall(20);
-
-        drive.faceTheProp(0.3);
-
-        drive.isFieldCentric = false;
-        // nudge forward
-        drive.nudge(-0.2);
-        sleep(100);
-        // lowers claw and drops pixel
+        drive.gotoBackDistance(20);
+        drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
+        drive.makeRobotCentric();
+        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
         arm.goToPickUp();
-        sleep(1000);
-
+        // Ensure the arm opens
+        arm.open();
+        sleep(500);
+        // Second Pixel Logic?
         arm.travelMode();
-
-        // get back
-        drive.nudge(0.3);
-
-        drive.turnToZero();
-
-        drive.isFieldCentric = true;
-
-        drive.backUpToWall(4);
-
-        drive.strafeUntilWall(-0.2);
-
-        drive.fwdFromWall(50, 8);
-
-        drive.strafeUntilWall(0.7);
-
-
-        // DONE: CLEAN UP
-        drive.stop();
-        this.terminateOpModeNow();
+        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+        drive.goToZero();
+        drive.makeFieldCentric();
+        drive.gotoBackDistance(4);
+        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.LEFT, 4.75);
     }
 }

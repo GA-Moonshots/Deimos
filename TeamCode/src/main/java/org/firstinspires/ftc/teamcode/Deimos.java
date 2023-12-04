@@ -16,7 +16,7 @@ public class Deimos extends LinearOpMode {
 
     // SUBSYSTEMS
     private Arm arm;
-    private MecanumDrive driveyMcDriveDriveDriverson;
+    private MecanumDrive drive;
     private Elevator elevator;
 
     // INSTANCE VARIABLES
@@ -38,7 +38,7 @@ public class Deimos extends LinearOpMode {
     public void runOpMode() {
         // Init (runs once)
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        driveyMcDriveDriveDriverson = new MecanumDrive(this);
+        drive = new MecanumDrive(this);
         arm = new Arm(this);
         elevator = new Elevator(hardwareMap, telemetry);
 
@@ -49,7 +49,8 @@ public class Deimos extends LinearOpMode {
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
             telemetry.addData("G2LS", "(%f, %f)", gamepad2.left_stick_x, gamepad2.left_stick_y);
             telemetry.addData("G2RS", "(%f, %f)", gamepad2.right_stick_x, gamepad2.right_stick_y);
-            telemetry.addData("Camera:", driveyMcDriveDriveDriverson.camera.getStatus());
+            telemetry.addData("Camera:", drive.camera.getStatus());
+            drive.getSensorReadout();
             telemetry.update();
         }
 
@@ -61,7 +62,7 @@ public class Deimos extends LinearOpMode {
             telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
             //telemetry.addData("UPS", 1 / (timer.seconds() - lastTime));
-            telemetry.addData("Camera:", driveyMcDriveDriveDriverson.camera.getStatus());
+            telemetry.addData("Camera:", drive.camera.getStatus());
             //lastTime = timer.seconds();
 
             // Driver 1: Responsible for drivetrain and movement
@@ -82,7 +83,7 @@ public class Deimos extends LinearOpMode {
 
         // A BUTTON: toggles field-centric VS robot-centric driving
         if(gamepad1.a && !gp1aPressed && !gamepad1.start) {
-            driveyMcDriveDriveDriverson.isFieldCentric = !driveyMcDriveDriveDriverson.isFieldCentric;
+            drive.toggleFieldCentric();
         }
         gp1aPressed = gamepad1.a; // this structure avoids double press
 
@@ -93,10 +94,6 @@ public class Deimos extends LinearOpMode {
         gp1bPressed = gamepad1.b; // this structure avoids double press
 
         // X BUTTON: available
-        boolean xPressed = gamepad1.x;
-        if (xPressed) {
-
-        }
 
         // Y BUTTON : available
 
@@ -118,9 +115,9 @@ public class Deimos extends LinearOpMode {
         // JOYSTICK: motion control - left stick strafes / right stick rotates
         // is the pilot denied control of the robot while we line up to an April tag?
         if(align != MecanumDrive.AprilTagToAlign.NONE) {
-            if(!driveyMcDriveDriveDriverson.alignToAprilTag(align)) {
-                align = MecanumDrive.AprilTagToAlign.NONE;
-            }
+            //if(!drive.alignToAprilTag(align)) {
+             //   align = MecanumDrive.AprilTagToAlign.NONE;
+            //}
         // listen to driver controls
         } else {
             telemetry.addData("Drive", "Listening to LSX, LSY, RSX");
@@ -134,7 +131,7 @@ public class Deimos extends LinearOpMode {
             if (Math.abs(strafe) <= Constants.INPUT_THRESHOLD)  strafe = 0.0d;
             if (Math.abs(turn) <= Constants.INPUT_THRESHOLD) turn = 0.0d;
 
-            driveyMcDriveDriveDriverson.drive(forward * speedMod, strafe, turn);
+            drive.drive(forward * speedMod, strafe, turn);
         }
 
     }

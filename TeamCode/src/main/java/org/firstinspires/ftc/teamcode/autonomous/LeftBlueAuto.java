@@ -30,32 +30,21 @@ public class LeftBlueAuto extends LinearOpMode {
 
         waitForStart();
 
-        // approach and face the prop
-        drive.fwdFromWall(20);
-        drive.faceTheProp(0.3);
-        // go robot centric driving
-        drive.isFieldCentric = false;
-        // nudge forward
-        drive.nudge(-0.2);
-        sleep(100);
-        // lowers claw and drops pixel
+        drive.gotoBackDistance(20);
+        drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
+        drive.makeRobotCentric();
+        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
         arm.goToPickUp();
-        sleep(1000);
-
+        // Ensure the arm opens
+        arm.open();
+        sleep(500);
+        // Second Pixel Logic?
         arm.travelMode();
-
-        // get back
-        drive.nudge(0.3);
-
-        drive.turnToZero();
-
-        // GET TO PARK
-        drive.backUpToWall(4);
-        drive.strafeUntilWall(-0.3);
-
-        // DONE: CLEAN UP
-        drive.stop();
-        this.terminateOpModeNow();
+        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+        drive.goToZero();
+        drive.makeFieldCentric();
+        drive.gotoBackDistance(4);
+        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.LEFT, 4.75);
 
     }
 }
