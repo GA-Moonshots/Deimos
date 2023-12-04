@@ -30,7 +30,7 @@ public class LeftBlueAuto extends LinearOpMode {
 
         waitForStart();
 
-        drive.gotoBackDistance(20);
+        drive.gotoBackDistance(22);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
         drive.makeRobotCentric();
         drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
@@ -44,7 +44,7 @@ public class LeftBlueAuto extends LinearOpMode {
         drive.goToZero();
         drive.makeFieldCentric();
         drive.gotoBackDistance(4);
-        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.LEFT, 4.75);
+        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.LEFT, 5.5);
 
     }
 }

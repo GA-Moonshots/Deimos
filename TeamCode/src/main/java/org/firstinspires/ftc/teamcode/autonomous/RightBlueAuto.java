@@ -33,7 +33,7 @@ public class RightBlueAuto extends LinearOpMode {
 
         waitForStart();
 
-        drive.gotoBackDistance(20);
+        drive.gotoBackDistance(22);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
         drive.makeRobotCentric();
         drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
