@@ -34,7 +34,7 @@ public class RedLeftAuto extends LinearOpMode {
         drive.gotoBackDistance(22);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
 
-        // because autonomous robots use trig to stay ready for a controller input for some reason
+        // TODO: support completely robot-centric autonomous
         drive.makeRobotCentric();
 
         // nudge the pixel and hope we get our 20 points

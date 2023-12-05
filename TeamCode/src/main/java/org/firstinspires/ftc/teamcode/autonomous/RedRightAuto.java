@@ -34,7 +34,7 @@ public class RedRightAuto extends LinearOpMode {
         drive.gotoBackDistance(22);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
 
-        // because of reasons
+        // TODO: support completely robot-centric autonomous
         drive.makeRobotCentric();
 
         // nudge the piece and hope we get it on the line for 20 points
@@ -52,7 +52,7 @@ public class RedRightAuto extends LinearOpMode {
         // straighten out
         drive.goToZero();
 
-        // entirely avoidable added complication again
+        // TODO: support completely robot-centric autonomous
         drive.makeFieldCentric();
 
         // back up to the wall

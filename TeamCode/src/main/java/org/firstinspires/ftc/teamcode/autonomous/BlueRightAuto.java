@@ -34,7 +34,7 @@ public class BlueRightAuto extends LinearOpMode {
         drive.gotoBackDistance(22);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
 
-        // temporarily engage sensible logic
+        // TODO: support completely robot-centric autonomous
         drive.makeRobotCentric();
 
         // nudge the pixel forward and hope for the best
@@ -49,7 +49,7 @@ public class BlueRightAuto extends LinearOpMode {
         drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
         drive.goToZero();
 
-        // could we keep autonomous robot-centric? Sure, but higher risk is higher fun
+        // TODO: support completely robot-centric autonomous
         drive.makeFieldCentric();
 
         // JOURNEY AROUND THE HUNKS OF METAL TO PARK

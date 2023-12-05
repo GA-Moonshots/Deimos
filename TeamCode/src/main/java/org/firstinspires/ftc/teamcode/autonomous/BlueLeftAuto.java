@@ -34,7 +34,7 @@ public class BlueLeftAuto extends LinearOpMode {
         drive.gotoBackDistance(22);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
 
-        // suddenly realize we shouldn't be compensating for a driver's joystick
+        // TODO: support completely robot-centric autonomous
         drive.makeRobotCentric();
 
         // nudge the pixel and hope it gets onto the line
@@ -52,7 +52,7 @@ public class BlueLeftAuto extends LinearOpMode {
         // straighten out
         drive.goToZero();
 
-        // engage complexity
+        // TODO: support completely robot-centric autonomous
         drive.makeFieldCentric();
 
         // back to wall
