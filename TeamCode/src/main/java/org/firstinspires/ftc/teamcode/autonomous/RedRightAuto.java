@@ -26,7 +26,7 @@ public class RedRightAuto extends LinearOpMode {
         arm = new Arm(this);
 
         while(opModeInInit())
-            drive.getSensorReadout();
+            drive.postDistanceReadouts();
 
         waitForStart();
 
@@ -39,7 +39,7 @@ public class RedRightAuto extends LinearOpMode {
 
         // nudge the piece and hope we get it on the line for 20 points
         // Forward is negative Mr. A...
-        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+        drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 0.5);
 
         // place the pixel with a couple of redundant commands
         arm.goToPickUp();
@@ -48,7 +48,7 @@ public class RedRightAuto extends LinearOpMode {
         arm.travelMode();
 
         // scoot back
-        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+        drive.autonomouslyDriveByTime(0.2, 0.0, 0.0, 0.5);
 
         // straighten out
         drive.goToZero();
@@ -60,6 +60,6 @@ public class RedRightAuto extends LinearOpMode {
         drive.gotoBackDistance(4);
 
         // park for 5 points
-        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.RIGHT, 4.75);
+        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.RIGHT, 4.75);
     }
 }

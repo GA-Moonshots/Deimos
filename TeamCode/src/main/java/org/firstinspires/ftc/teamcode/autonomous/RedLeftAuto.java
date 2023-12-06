@@ -26,7 +26,7 @@ public class RedLeftAuto extends LinearOpMode {
         arm = new Arm(this);
 
         while(opModeInInit())
-            drive.getSensorReadout();
+            drive.postDistanceReadouts();
 
         waitForStart();
 
@@ -39,7 +39,7 @@ public class RedLeftAuto extends LinearOpMode {
 
         // nudge the pixel and hope we get our 20 points
         // Forward is negative Mr. A...
-        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+        drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 0.5);
 
         // when you don't trust your code, do it twice
         arm.goToPickUp();
@@ -48,7 +48,7 @@ public class RedLeftAuto extends LinearOpMode {
 
         // pack up the claw and scoot back
         arm.travelMode();
-        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+        drive.autonomouslyDriveByTime(0.2, 0.0, 0.0, 0.5);
 
         // center out
         drive.goToZero();
@@ -58,9 +58,9 @@ public class RedLeftAuto extends LinearOpMode {
 
         // JOURNEY AROUND THE DIVIDER TO PARK
         drive.gotoBackDistance(4);
-        drive.autoGoToPosition(0.2, 5, MecanumDrive.HowToMove.LEFT, 3);
+        drive.autonomouslyMove(0.2, 5, MecanumDrive.HowToMove.LEFT, 3);
         drive.gotoBackDistance(50, 2); // move forward
-        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.RIGHT, 4);
+        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.RIGHT, 4);
 
     }
 }

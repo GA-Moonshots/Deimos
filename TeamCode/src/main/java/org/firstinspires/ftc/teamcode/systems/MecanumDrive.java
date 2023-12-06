@@ -47,6 +47,7 @@ public class MecanumDrive {
     // INSTANCE VARIABLES
     private LinearOpMode opMode;
     private double gyroTarget = 0.0d;
+    private double runawayRobotShield = -1;
     private double lastAprilTagYaw = 0.0d;
     private double lastAprilTagStrafe = 0.0d;
     private double fieldCentricTarget = 0.0d;
@@ -89,7 +90,20 @@ public class MecanumDrive {
         isFieldCentric = !isFieldCentric;
     }
 
+    public void resetFieldCentricTarget() {
+        fieldCentricTarget = imu.getZAngle();
+    }
+
+    public void postDistanceReadouts() {
+        telemetry.addData("Left Dist", leftDistance.getDistance());
+        telemetry.addData("Right Dist", rightDistance.getDistance());
+        telemetry.addData("Rear Dist", rearDistance.getDistance());
+    }
+
     // ---- CORE DRIVE COMMANDS ----
+    // ---- CORE DRIVE COMMANDS ----
+    // ---- CORE DRIVE COMMANDS ----
+
     /**
      * Stops the drive from moving
      */
@@ -98,9 +112,9 @@ public class MecanumDrive {
     }
 
     /**
-     *
+     * Translates desired motion into mecanum commands
      * @param forward negative is forward
-     * @param strafe
+     * @param strafe lateral movement
      * @param turn positive is clockwise
      */
     public void drive(double forward, double strafe, double turn) {
@@ -166,6 +180,9 @@ public class MecanumDrive {
         );
     }
 
+    /**
+     * Clips and executes given motor speeds
+     */
     protected void drive(double m1, double m2, double m3, double m4) {
         leftFront.setPower(Range.clip(m1, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED));
         rightFront.setPower(Range.clip(m2, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED));
@@ -173,9 +190,21 @@ public class MecanumDrive {
         rightBack.setPower(Range.clip(m4, -Constants.MOTOR_MAX_SPEED, Constants.MOTOR_MAX_SPEED));
     }
 
-    public void autoDriveByTime(double forward, double strafe, double turn, double time) {
-        assert forward >= -1 && forward <= 1 && strafe >= -1 && strafe <= 1 && turn >= -1 && turn <= 1 && time > 0;
+    // ---- AUTONOMOUS DRIVE COMMANDS ----
+    // ---- AUTONOMOUS DRIVE COMMANDS ----
+    // ---- AUTONOMOUS DRIVE COMMANDS ----
 
+    /**
+     * Rotates robot to its imu's 0 degree heading adjusted by fieldCentricTarget
+     */
+    public void goToZero() {
+        while (Math.abs(imu.getZAngle() - fieldCentricTarget) >= 2 && opMode.opModeIsActive()) {
+            drive(0.0, 0.0, Math.toRadians(imu.getZAngle() - fieldCentricTarget));
+        }
+        stop();
+    }
+
+    public void autonomouslyDriveByTime(double forward, double strafe, double turn, double time) {
         ElapsedTime rt = new ElapsedTime();
         while(opMode.opModeIsActive() && rt.seconds() <= time) {
             drive(forward, strafe, turn);
@@ -184,46 +213,41 @@ public class MecanumDrive {
     }
 
     /**
-     * Blocking Autonomous drive command, with a maxTime backup system
-     *
      * @param strength The speed to move at. This should always be positive
      * @param target The distance (or angle) that the sensor attempts to go to
      * @param side The sensor (or rotation direction) to listen to and move in
      * @param maxTime The maximum time in seconds this function is allowed to run for
-     *
-     * @return If this function stopped by distance sensors (true) or by time (false)
      */
-    public void autoGoToPosition(double strength, double target, HowToMove side, double maxTime) {
-        assert maxTime > 0 && strength > 0 && strength <= 1;
+    public void autonomouslyMove(double strength, double target, HowToMove side, double maxTime) {
         ElapsedTime runtime = new ElapsedTime();
         while(opMode.opModeIsActive() && runtime.seconds() <= maxTime) {
             switch (side) {
                 case LEFT:
-                    if(autoStrafeBySensor(leftDistance, strength, target)) {
+                    if(maintainStrafe(leftDistance, strength, target)) {
                         stop();
                         return;
                     }
                     break;
                 case RIGHT:
-                    if(autoStrafeBySensor(rightDistance, -strength, target)) {
+                    if(maintainStrafe(rightDistance, -strength, target)) {
                         stop();
                         return;
                     }
                     break;
                 case BACK:
-                    if(autoForwardBySensor(rearDistance, strength, target)) {
+                    if(maintainForward(rearDistance, strength, target)) {
                         stop();
                         return;
                     }
                     break;
                 case ROTATE_LEFT:
-                    if(autoTurn(-strength, target)) {
+                    if(maintainTurn(-strength, target)) {
                         stop();
                         return;
                     }
                     break;
                 case ROTATE_RIGHT:
-                    if(autoTurn(strength, target)) {
+                    if(maintainTurn(strength, target)) {
                         stop();
                         return;
                     }
@@ -233,35 +257,76 @@ public class MecanumDrive {
         stop();
     }
 
-    protected boolean autoStrafeBySensor(DistanceSensor sensor, double strength, double target) {
-        // Check if we finished the step
-        if(Math.abs(sensor.getDistance() - target) <= Constants.DISTANCE_THRESHOLD) {
+    /**
+     * A repeatedly called feedback control loop that uses a proportional gain
+     * to control the robot's strafing motion and reach a specific lateral position.
+     * @param sensor the distance sensor used to determine completion
+     * @param strength motor power
+     * @param target desired distance
+     * @return true if complete, false if needs to continue
+     */
+    protected boolean maintainStrafe(DistanceSensor sensor, double strength, double target) {
+        // note the current distance
+        double distance = sensor.getDistance();
+
+        // one-time, initial determination if we're approaching or leaving the wall
+        if(runawayRobotShield == -1) {
+            // if we're leaving, cap the allowed distance
+            runawayRobotShield = distance > target ? 0 : target + Constants.DISTANCE_THRESHOLD;
+        }
+        // IS IT TIME TO STOP?
+        if(Math.abs(distance - target) <= Constants.DISTANCE_THRESHOLD ||
+                (runawayRobotShield != 0 && distance > runawayRobotShield)) {
             stop();
+            runawayRobotShield = -1; // reset the shield
             return true;
         }
 
-        // Continue the step by P (no I or D yet)
+        // CONTINUE DRIVING
         // If we are further away than we should be (distance > target) on left side,
         // we should go back to the left (ie negative value)
         drive(0.0d, Constants.KP * strength * (target - sensor.getDistance()), 0.0d);
         return false;
     }
 
-    protected boolean autoForwardBySensor(DistanceSensor sensor, double strength, double target) {
-        if(Math.abs(sensor.getDistance() - target) <= Constants.DISTANCE_THRESHOLD) {
+    /**
+     * A repeatedly called feedback control loop using proportional gain
+     * @param sensor distance sensor used to determine progress
+     * @param strength motor speed, negative is forward
+     * @param target desired distance
+     * @return true if completed, false if motion needs to continue
+     */
+    protected boolean maintainForward(DistanceSensor sensor, double strength, double target) {
+        // note the current distance
+        double distance = sensor.getDistance();
+
+        // one-time, initial determination if we're approaching or leaving the wall
+        if(runawayRobotShield == -1) {
+            // if we're leaving, cap the allowed distance
+            runawayRobotShield = distance > target ? 0 : target + Constants.DISTANCE_THRESHOLD;
+        }
+        // IS IT TIME TO STOP?
+        if(Math.abs(distance - target) <= Constants.DISTANCE_THRESHOLD ||
+                (runawayRobotShield != 0 && distance > runawayRobotShield)) {
             stop();
+            runawayRobotShield = -1; // reset the shield
             return true;
         }
 
-        // Continue the step by P (no I or D yet)
+        // CONTINUE DRIVING
         // If we are further away than we should be (distance > target),
         // we should go backwards (positive value)
         drive(Constants.KP * strength * (sensor.getDistance() - target), 0.0d, 0.0d);
-
         return false;
     }
 
-    protected boolean autoTurn(double strength, double target) {
+    /**
+     * A repeatedly called feedback control loop for rotating the robot
+     * @param strength motor speed
+     * @param target desired gyroscope reading
+     * @return true if motion is completed, false if needs to continue
+     */
+    protected boolean maintainTurn(double strength, double target) {
         // Wrap target
         target %= 360;
 
@@ -273,6 +338,26 @@ public class MecanumDrive {
         drive(0.0d, 0.0d, strength);
         return false;
     }
+
+    // ---- FRIENDLY AUTONOMOUS PASS-THROUGH COMMANDS ----
+    // ---- FRIENDLY AUTONOMOUS PASS-THROUGH COMMANDS ----
+    // ---- FRIENDLY AUTONOMOUS PASS-THROUGH COMMANDS ----
+
+    public void gotoBackDistance(double str, double target, double maxTime) {
+        autonomouslyMove(str, target, HowToMove.BACK, maxTime);
+    }
+
+    public void gotoBackDistance(double target, double maxTime) {
+        gotoBackDistance(0.3, target, maxTime);
+    }
+
+    public void gotoBackDistance(double target) {
+        gotoBackDistance( target, 3);
+    }
+
+    // ---- THIS YEAR'S GAME ----
+    // ---- THIS YEAR'S GAME ----
+    // ---- THIS YEAR'S GAME ----
 
     public void faceTheProp_new(double str, HowToMove movement, double maxTime) {
         assert (str > 0 && str <= 1) && (movement == HowToMove.ROTATE_LEFT || movement == HowToMove.ROTATE_RIGHT) && maxTime > 0;
@@ -291,13 +376,13 @@ public class MecanumDrive {
         }
 
         // back up
-        autoDriveByTime(0.1, 0.0, 0.0, 0.5);
+        autonomouslyDriveByTime(0.1, 0.0, 0.0, 0.5);
 
         // turn to prop based on prev
         if(isLeft) {
-            autoGoToPosition(str, -90, HowToMove.ROTATE_LEFT, 5);
+            autonomouslyMove(str, -90, HowToMove.ROTATE_LEFT, 5);
         } else if(isRight) {
-            autoGoToPosition(str, 90, HowToMove.ROTATE_RIGHT, 5);
+            autonomouslyMove(str, 90, HowToMove.ROTATE_RIGHT, 5);
         }
     }
 
@@ -333,34 +418,7 @@ public class MecanumDrive {
         // Rotate the opposite way
         HowToMove newMovement = (movement == HowToMove.ROTATE_LEFT) ? HowToMove.ROTATE_LEFT : HowToMove.ROTATE_RIGHT;
 
-        autoGoToPosition(str, targetAngle, newMovement, maxTime);
+        autonomouslyMove(str, targetAngle, newMovement, maxTime);
     }
 
-    /**
-     * Rotates robot to its imu's 0 deg heading
-     */
-    public void goToZero() {
-        while (Math.abs(imu.getZAngle() - fieldCentricTarget) >= 2 && opMode.opModeIsActive()) {
-            drive(0.0, 0.0, Math.toRadians(imu.getZAngle() - fieldCentricTarget));
-        }
-        stop();
-    }
-
-    public void getSensorReadout() {
-        telemetry.addData("Left Dist", leftDistance.getDistance());
-        telemetry.addData("Right Dist", rightDistance.getDistance());
-        telemetry.addData("Rear Dist", rearDistance.getDistance());
-    }
-
-    public void gotoBackDistance(double str, double target, double maxTime) {
-        autoGoToPosition(str, target, HowToMove.BACK, maxTime);
-    }
-
-    public void gotoBackDistance(double target, double maxTime) {
-        gotoBackDistance(0.3, target, maxTime);
-    }
-
-    public void gotoBackDistance(double target) {
-        gotoBackDistance( target, 3);
-    }
 }

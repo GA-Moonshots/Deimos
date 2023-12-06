@@ -26,7 +26,7 @@ public class BlueLeftAuto extends LinearOpMode {
         arm = new Arm(this);
 
         while(opModeInInit())
-            drive.getSensorReadout();
+            drive.postDistanceReadouts();
 
         waitForStart();
 
@@ -44,7 +44,7 @@ public class BlueLeftAuto extends LinearOpMode {
 
         // nudge the pixel and hope it gets onto the line
         // Forward is negative Mr. A...
-        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+        drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 0.5);
 
         // double open claw and take a half a second to pray
         arm.goToPickUp();
@@ -53,7 +53,7 @@ public class BlueLeftAuto extends LinearOpMode {
 
         // lift claw and scoot back
         arm.travelMode();
-        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+        drive.autonomouslyDriveByTime(0.2, 0.0, 0.0, 0.5);
 
         // straighten out
         drive.goToZero();
@@ -65,7 +65,7 @@ public class BlueLeftAuto extends LinearOpMode {
         drive.gotoBackDistance(4);
 
         // park for five points
-        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.LEFT, 5.5);
+        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.LEFT, 5.5);
 
     }
 }
