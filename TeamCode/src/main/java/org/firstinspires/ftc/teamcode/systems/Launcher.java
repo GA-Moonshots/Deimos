@@ -1,21 +1,17 @@
 package org.firstinspires.ftc.teamcode.systems;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 
-public class RailRocket {
+public class Launcher {
     private LinearOpMode opMode;
     // static variables can't go in the method, must go at top
-    public static final double POWER = 1;
     // the position of the motor when opened
-    public static final double OPENED_POSITION = 1;
+    public static final double OPENED_POSITION = 0;
     // the position of the motor when closed
-    public static final double CLOSED_POSITION = 0;
+    public static final double CLOSED_POSITION = 1;
     // these types are all caps "POWER" - standard
 
     /*
@@ -29,11 +25,12 @@ public class RailRocket {
     private Servo servo;
 
     // when creating a constructor for the robot these parameters are standard for most of this stuff
-    public RailRocket(LinearOpMode opMode){
+    public Launcher(LinearOpMode opMode){
         this.opMode = opMode;
 
         // look for a servo with a release pin and set this servo equal to that servo
-        this.servo = opMode.hardwareMap.get(Servo.class, Constants.RELEASE_SERVO_NAME);
+        servo = opMode.hardwareMap.get(Servo.class, Constants.LAUNCHER_SERVO_NAME);
+        lock();
         // at this point we have the servo, time to make it do stuff :)
 
     }
@@ -41,7 +38,7 @@ public class RailRocket {
     public void release(){
         servo.setPosition(OPENED_POSITION);
     }
-    public void reset(){
+    public void lock(){
         servo.setPosition(CLOSED_POSITION);
     }
 

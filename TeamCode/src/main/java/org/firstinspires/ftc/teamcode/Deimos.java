@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.systems.Elevator;
+import org.firstinspires.ftc.teamcode.systems.Launcher;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
@@ -18,6 +19,7 @@ public class Deimos extends LinearOpMode {
     private Arm arm;
     private MecanumDrive drive;
     private Elevator elevator;
+    private Launcher launcher;
 
     // INSTANCE VARIABLES
     private double lastTime = 0.0d;
@@ -33,6 +35,7 @@ public class Deimos extends LinearOpMode {
     private boolean gp2xPressed = false;
     private boolean gp2yPressed = false;
     private boolean gp2rbPressed = false;
+    private boolean gp2lbPressed = false;
     
     @Override
     public void runOpMode() {
@@ -41,6 +44,7 @@ public class Deimos extends LinearOpMode {
         drive = new MecanumDrive(this);
         arm = new Arm(this);
         elevator = new Elevator(hardwareMap, telemetry);
+        launcher = new Launcher(this);
 
         // Init Loop (runs until stop button or start button is pressed)
         while(opModeInInit()) {
@@ -176,6 +180,10 @@ public class Deimos extends LinearOpMode {
                 armState = Arm.RunState.NONE;
             return;
         }
+        if(gamepad2.right_trigger >= Constants.INPUT_THRESHOLD){
+            launcher.release();
+        }
+
 
         if(gamepad2.right_bumper && !gp2rbPressed) {
             elevator.toggleLock();
