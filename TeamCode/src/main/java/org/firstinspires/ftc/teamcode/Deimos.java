@@ -50,7 +50,7 @@ public class Deimos extends LinearOpMode {
             telemetry.addData("G2LS", "(%f, %f)", gamepad2.left_stick_x, gamepad2.left_stick_y);
             telemetry.addData("G2RS", "(%f, %f)", gamepad2.right_stick_x, gamepad2.right_stick_y);
             telemetry.addData("Camera:", drive.camera.getStatus());
-            drive.getSensorReadout();
+            drive.postDistanceReadouts();
             telemetry.update();
         }
 
