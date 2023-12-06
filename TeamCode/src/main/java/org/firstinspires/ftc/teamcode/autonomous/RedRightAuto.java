@@ -31,14 +31,15 @@ public class RedRightAuto extends LinearOpMode {
         waitForStart();
 
         // approach the props
-        drive.gotoBackDistance(22);
+        drive.gotoBackDistance(0.2, 22, 3);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
 
         // TODO: support completely robot-centric autonomous
         drive.makeRobotCentric();
 
         // nudge the piece and hope we get it on the line for 20 points
-        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+        // Forward is negative Mr. A...
+        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
 
         // place the pixel with a couple of redundant commands
         arm.goToPickUp();
@@ -47,7 +48,7 @@ public class RedRightAuto extends LinearOpMode {
         arm.travelMode();
 
         // scoot back
-        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
 
         // straighten out
         drive.goToZero();

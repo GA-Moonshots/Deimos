@@ -31,14 +31,15 @@ public class RedLeftAuto extends LinearOpMode {
         waitForStart();
 
         // approach the prop
-        drive.gotoBackDistance(22);
+        drive.gotoBackDistance(0.2, 21, 3);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
 
         // TODO: support completely robot-centric autonomous
         drive.makeRobotCentric();
 
         // nudge the pixel and hope we get our 20 points
-        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+        // Forward is negative Mr. A...
+        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
 
         // when you don't trust your code, do it twice
         arm.goToPickUp();
@@ -47,7 +48,7 @@ public class RedLeftAuto extends LinearOpMode {
 
         // pack up the claw and scoot back
         arm.travelMode();
-        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
 
         // center out
         drive.goToZero();
@@ -57,9 +58,9 @@ public class RedLeftAuto extends LinearOpMode {
 
         // JOURNEY AROUND THE DIVIDER TO PARK
         drive.gotoBackDistance(4);
-        drive.autoGoToPosition(0.2, 5, MecanumDrive.HowToMove.LEFT, 5);
-        drive.gotoBackDistance(50, 5); // move forward
-        drive.autoGoToPosition(0.7, 5, MecanumDrive.HowToMove.RIGHT, 5);
+        drive.autoGoToPosition(0.2, 5, MecanumDrive.HowToMove.LEFT, 3);
+        drive.gotoBackDistance(50, 2); // move forward
+        drive.autoGoToPosition(0.3, 5, MecanumDrive.HowToMove.RIGHT, 4);
 
     }
 }

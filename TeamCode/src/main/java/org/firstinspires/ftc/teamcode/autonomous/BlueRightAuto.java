@@ -31,14 +31,15 @@ public class BlueRightAuto extends LinearOpMode {
         waitForStart();
 
         // approach prop
-        drive.gotoBackDistance(22);
+        drive.gotoBackDistance(0.2, 22, 3);
         drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
 
         // TODO: support completely robot-centric autonomous
         drive.makeRobotCentric();
 
         // nudge the pixel forward and hope for the best
-        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
+        // Forward is negative Mr. A...
+        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
 
         // lift the claw x2
         arm.goToPickUp();
@@ -46,7 +47,7 @@ public class BlueRightAuto extends LinearOpMode {
         sleep(500); // Ensure the arm opens
 
         arm.travelMode();
-        drive.autoDriveByTime(-0.2, 0.0, 0.0, 0.5);
+        drive.autoDriveByTime(0.2, 0.0, 0.0, 0.5);
         drive.goToZero();
 
         // TODO: support completely robot-centric autonomous

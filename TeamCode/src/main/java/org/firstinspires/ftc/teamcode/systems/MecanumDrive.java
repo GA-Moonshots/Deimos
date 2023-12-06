@@ -240,12 +240,10 @@ public class MecanumDrive {
             return true;
         }
 
-        // Continue the step
-        if(sensor.getDistance() > target) {
-            drive(0.0d, -strength, 0.0d);
-        } else {
-            drive(0.0d, strength, 0.0d);
-        }
+        // Continue the step by P (no I or D yet)
+        // If we are further away than we should be (distance > target) on left side,
+        // we should go back to the left (ie negative value)
+        drive(0.0d, Constants.KP * strength * (target - sensor.getDistance()), 0.0d);
         return false;
     }
 
@@ -255,11 +253,11 @@ public class MecanumDrive {
             return true;
         }
 
-        if(sensor.getDistance() > target) {
-            drive(strength, 0.0d, 0.0d);
-        } else {
-            drive(-strength, 0.0d, 0.0d);
-        }
+        // Continue the step by P (no I or D yet)
+        // If we are further away than we should be (distance > target),
+        // we should go backwards (positive value)
+        drive(Constants.KP * strength * (sensor.getDistance() - target), 0.0d, 0.0d);
+
         return false;
     }
 
@@ -276,7 +274,34 @@ public class MecanumDrive {
         return false;
     }
 
-    public void faceTheProp(double str, HowToMove movement, double maxTime){
+    public void faceTheProp_new(double str, HowToMove movement, double maxTime) {
+        assert (str > 0 && str <= 1) && (movement == HowToMove.ROTATE_LEFT || movement == HowToMove.ROTATE_RIGHT) && maxTime > 0;
+
+        boolean isLeft = false;
+        boolean isRight = false;
+
+        // check left
+        if(leftDistance.getDistance() <= 10) {
+            isLeft = true;
+        }
+
+        //check right
+        else if(rightDistance.getDistance() <= 10) {
+            isRight = true;
+        }
+
+        // back up
+        autoDriveByTime(0.1, 0.0, 0.0, 0.5);
+
+        // turn to prop based on prev
+        if(isLeft) {
+            autoGoToPosition(str, -90, HowToMove.ROTATE_LEFT, 5);
+        } else if(isRight) {
+            autoGoToPosition(str, 90, HowToMove.ROTATE_RIGHT, 5);
+        }
+    }
+
+    public void faceTheProp(double str, HowToMove movement, double maxTime) {
         assert (str > 0 && str <= 1) && (movement == HowToMove.ROTATE_LEFT || movement == HowToMove.ROTATE_RIGHT);
 
         // Set the power value to the correct mode
@@ -297,7 +322,7 @@ public class MecanumDrive {
         telemetry.update();
 
         // Find the new target angle to go to
-        double targetAngle = (imu.getZAngle() - fieldCentricTarget + 180) % 360;
+        double targetAngle = (imu.getZAngle() - fieldCentricTarget + 180);
         if(targetAngle > 180) {
             targetAngle -= 360;
         }
