@@ -32,7 +32,7 @@ public class RedLeftAuto extends LinearOpMode {
 
         // approach the prop
         drive.gotoBackDistance(0.2, 21, 3);
-        drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
+        drive.circleScanForProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
 
         // TODO: support completely robot-centric autonomous
         drive.makeRobotCentric();

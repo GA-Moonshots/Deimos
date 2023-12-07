@@ -71,9 +71,9 @@ public class MecanumDrive {
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rearDistance = new DistanceSensor(opMode.hardwareMap, Constants.REAR_DIST_NAME);
-        rightDistance = new DistanceSensor(opMode.hardwareMap, Constants.RIGHT_DIST_NAME);
-        leftDistance = new DistanceSensor(opMode.hardwareMap, Constants.LEFT_DIST_NAME);
+        rearDistance = new DistanceSensor(opMode, Constants.REAR_DIST_NAME);
+        rightDistance = new DistanceSensor(opMode, Constants.RIGHT_DIST_NAME);
+        leftDistance = new DistanceSensor(opMode, Constants.LEFT_DIST_NAME);
 
         fieldCentricTarget = imu.getZAngle();
     }
@@ -359,36 +359,26 @@ public class MecanumDrive {
     // ---- THIS YEAR'S GAME ----
     // ---- THIS YEAR'S GAME ----
 
-    public void faceTheProp_new(double str, HowToMove movement, double maxTime) {
-        assert (str > 0 && str <= 1) && (movement == HowToMove.ROTATE_LEFT || movement == HowToMove.ROTATE_RIGHT) && maxTime > 0;
-
+    public void faceTheProp(double str) {
         boolean isLeft = false;
         boolean isRight = false;
 
         // check left
-        if(leftDistance.getDistance() <= 10) {
-            isLeft = true;
-        }
-
+        if(leftDistance.doubleCheckDistance() <= 10) isLeft = true;
         //check right
-        else if(rightDistance.getDistance() <= 10) {
-            isRight = true;
-        }
+        else if(rightDistance.doubleCheckDistance() <= 10) isRight = true;
 
         // back up
         autonomouslyDriveByTime(0.1, 0.0, 0.0, 0.5);
 
         // turn to prop based on prev
-        if(isLeft) {
+        if(isLeft)
             autonomouslyMove(str, -90, HowToMove.ROTATE_LEFT, 5);
-        } else if(isRight) {
+        else if(isRight)
             autonomouslyMove(str, 90, HowToMove.ROTATE_RIGHT, 5);
-        }
     }
 
-    public void faceTheProp(double str, HowToMove movement, double maxTime) {
-        assert (str > 0 && str <= 1) && (movement == HowToMove.ROTATE_LEFT || movement == HowToMove.ROTATE_RIGHT);
-
+    public void circleScanForProp(double str, HowToMove movement, double maxTime) {
         // Set the power value to the correct mode
         double realStr = movement == HowToMove.ROTATE_LEFT ? -str : str;
         // Add timing? May not be required for this function
@@ -401,7 +391,6 @@ public class MecanumDrive {
             drive(0.0, 0.0, realStr);
         }
         stop();
-
 
         telemetry.addData("Ed sez", "I saw the prop :) good job wahoo");
         telemetry.update();

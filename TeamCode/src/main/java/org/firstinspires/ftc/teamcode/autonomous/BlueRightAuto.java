@@ -32,7 +32,7 @@ public class BlueRightAuto extends LinearOpMode {
 
         // approach prop
         drive.gotoBackDistance(0.2, 22, 3);
-        drive.faceTheProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
+        drive.circleScanForProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
 
         // TODO: support completely robot-centric autonomous
         drive.makeRobotCentric();

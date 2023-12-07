@@ -33,7 +33,8 @@ public class BlueLeftAuto extends LinearOpMode {
         // approach the prop
         drive.gotoBackDistance(0.1, 27, 4);
 
-        drive.faceTheProp_new(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
+        drive.faceTheProp(0.3);
+
         stop();
         terminateOpModeNow();
         // TODO: support completely robot-centric autonomous
