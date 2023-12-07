@@ -73,7 +73,7 @@ public class TestMode extends LinearOpMode {
     }
 
     public void elevatorTest() {
-        Elevator elevator = new Elevator(hardwareMap, telemetry);
+        Elevator elevator = new Elevator(this);
         MecanumDrive drive = new MecanumDrive(this);
         waitForStart();
 

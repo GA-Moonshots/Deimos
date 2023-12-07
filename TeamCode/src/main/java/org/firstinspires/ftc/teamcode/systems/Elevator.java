@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.systems;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -10,21 +12,23 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 public class Elevator {
     private DcMotor motor;
+    private LinearOpMode opMode;
 
     private Servo leftServo;
     private Servo rightServo;
 
-    private boolean isLocked;
+    private boolean isLocked = false;
 
 
-    public Elevator(HardwareMap hardwareMap, Telemetry telemetry) {
-        motor = hardwareMap.get(DcMotor.class, Constants.ELEVATOR_MOTOR_NAME);
+    public Elevator(LinearOpMode opMode) {
+        this.opMode = opMode;
+        motor = opMode.hardwareMap.get(DcMotor.class, Constants.ELEVATOR_MOTOR_NAME);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftServo = hardwareMap.get(Servo.class, Constants.ELEVATOR_LEFT_SERVO_NAME);
-        rightServo = hardwareMap.get(Servo.class, Constants.ELEVATOR_RIGHT_SERVO_NAME);
+        leftServo = opMode.hardwareMap.get(Servo.class, Constants.ELEVATOR_LEFT_SERVO_NAME);
+        rightServo = opMode.hardwareMap.get(Servo.class, Constants.ELEVATOR_RIGHT_SERVO_NAME);
         rightServo.setDirection(Servo.Direction.REVERSE);
-        isLocked = true;
-        toggleLock();
+        leftServo.setPosition(Constants.LOCK_OFF_POSITION);
+        rightServo.setPosition(Constants.LOCK_OFF_POSITION);
     }
 
     public void move(double str) {

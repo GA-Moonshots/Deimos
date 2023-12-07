@@ -41,8 +41,4 @@ public class Launcher {
     public void lock(){
         servo.setPosition(CLOSED_POSITION);
     }
-
-
-
-
 }

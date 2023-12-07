@@ -20,7 +20,7 @@ public class RedRightAuto extends LinearOpMode {
     }
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new MecanumDrive(this);
         arm = new Arm(this);
@@ -30,33 +30,25 @@ public class RedRightAuto extends LinearOpMode {
 
         waitForStart();
 
-        // approach the props
-        drive.gotoBackDistance(0.2, 22, 3);
-        drive.circleScanForProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
+        // approach the prop
+        drive.gotoBackDistance(0.11, 26, 4);
 
-        // TODO: support completely robot-centric autonomous
-        drive.makeRobotCentric();
-
-        // nudge the piece and hope we get it on the line for 20 points
-        // Forward is negative Mr. A...
-        drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 0.5);
-
-        // place the pixel with a couple of redundant commands
-        arm.goToPickUp();
+        drive.faceTheProp(0.3);
+        stop();
         arm.open();
-        sleep(500); // Ensure the arm opens
+        sleep(100);
+
+        // lift claw to get out of the way
         arm.travelMode();
 
-        // scoot back
-        drive.autonomouslyDriveByTime(0.2, 0.0, 0.0, 0.5);
+        // This needs to be in field centric mode since it is going to go backwards regardless of what
+        // position the robot goes to in the faceTheProp method.
+        drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 2);
 
         // straighten out
         drive.goToZero();
 
-        // TODO: support completely robot-centric autonomous
-        drive.makeFieldCentric();
-
-        // back up to the wall
+        // back up to the wall the rest of the way
         drive.gotoBackDistance(4);
 
         // park for 5 points

@@ -30,34 +30,30 @@ public class BlueRightAuto extends LinearOpMode {
 
         waitForStart();
 
-        // approach prop
-        drive.gotoBackDistance(0.2, 22, 3);
-        drive.circleScanForProp(0.3, MecanumDrive.HowToMove.ROTATE_LEFT, 8);
+        // approach the prop
+        drive.gotoBackDistance(0.125, 24, 4);
 
-        // TODO: support completely robot-centric autonomous
-        drive.makeRobotCentric();
-
-        // nudge the pixel forward and hope for the best
-        // Forward is negative Mr. A...
-        drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 0.5);
-
-        // lift the claw x2
-        arm.goToPickUp();
+        drive.faceTheProp(0.3);
+        stop();
         arm.open();
-        sleep(500); // Ensure the arm opens
+        sleep(100);
 
+        // lift claw to get out of the way
         arm.travelMode();
-        drive.autonomouslyDriveByTime(0.2, 0.0, 0.0, 0.5);
+
+        // This needs to be in field centric mode since it is going to go backwards regardless of what
+        // position the robot goes to in the faceTheProp method to avoid running over the prop.
+        drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 2);
+
+        // straighten out
         drive.goToZero();
 
-        // TODO: support completely robot-centric autonomous
-        drive.makeFieldCentric();
-
-        // JOURNEY AROUND THE HUNKS OF METAL TO PARK
+        // back to wall the rest of the way
         drive.gotoBackDistance(4);
-        drive.autonomouslyMove(0.2, 5, MecanumDrive.HowToMove.RIGHT, 5);
-        drive.gotoBackDistance(50, 5);
-        drive.autonomouslyMove(0.7, 5, MecanumDrive.HowToMove.LEFT, 5);
+
+        drive.autonomouslyMove(0.15, 6, MecanumDrive.HowToMove.RIGHT, 3);
+        drive.autonomouslyDriveByTime(-0.5 , 0.0, 0.0,2.65);
+        drive.autonomouslyMove(0.7, 7, MecanumDrive.HowToMove.LEFT, 5);
 
     }
 }

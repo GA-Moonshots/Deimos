@@ -43,7 +43,7 @@ public class Deimos extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new MecanumDrive(this);
         arm = new Arm(this);
-        elevator = new Elevator(hardwareMap, telemetry);
+        elevator = new Elevator(this);
         launcher = new Launcher(this);
 
         // Init Loop (runs until stop button or start button is pressed)

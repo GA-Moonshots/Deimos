@@ -31,39 +31,27 @@ public class BlueLeftAuto extends LinearOpMode {
         waitForStart();
 
         // approach the prop
-        drive.gotoBackDistance(0.1, 27, 4);
+        drive.gotoBackDistance(0.125, 24, 4);
 
         drive.faceTheProp(0.3);
-
         stop();
-        terminateOpModeNow();
-        // TODO: support completely robot-centric autonomous
-        drive.makeRobotCentric();
-
-        // nudge the pixel and hope it gets onto the line
-        // Forward is negative Mr. A...
-        drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 0.5);
-
-        // double open claw and take a half a second to pray
-        arm.goToPickUp();
         arm.open();
-        sleep(500);
+        sleep(100);
 
-        // lift claw and scoot back
+        // lift claw to get out of the way
         arm.travelMode();
-        drive.autonomouslyDriveByTime(0.2, 0.0, 0.0, 0.5);
+
+        // This needs to be in field centric mode since it is going to go backwards regardless of what
+        // position the robot goes to in the faceTheProp method.
+        drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 2);
 
         // straighten out
         drive.goToZero();
 
-        // TODO: support completely robot-centric autonomous
-        drive.makeFieldCentric();
-
-        // back to wall
+        // back to wall the rest of the way
         drive.gotoBackDistance(4);
 
         // park for five points
-        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.LEFT, 5.5);
-
+        drive.gotoLeftDistance(5, 5.5);
     }
 }

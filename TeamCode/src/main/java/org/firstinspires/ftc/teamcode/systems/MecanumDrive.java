@@ -199,7 +199,7 @@ public class MecanumDrive {
      */
     public void goToZero() {
         while (Math.abs(imu.getZAngle() - fieldCentricTarget) >= 2 && opMode.opModeIsActive()) {
-            drive(0.0, 0.0, Math.toRadians(imu.getZAngle() - fieldCentricTarget));
+            drive(0.0, 0.0, 0.7 * Math.toRadians(imu.getZAngle() - fieldCentricTarget));
         }
         stop();
     }
@@ -355,27 +355,63 @@ public class MecanumDrive {
         gotoBackDistance( target, 3);
     }
 
+    public void gotoRightDistance(double str, double target, double maxTime) {
+        autonomouslyMove(str, target, HowToMove.RIGHT, maxTime);
+    }
+
+    public void gotoRightDistance(double target, double maxTime) {
+        gotoRightDistance(0.3, target, maxTime);
+    }
+
+    public void gotoRightDistance(double target) {
+        gotoRightDistance( target, 3);
+    }
+
+    public void gotoLeftDistance(double str, double target, double maxTime) {
+        autonomouslyMove(str, target, HowToMove.LEFT, maxTime);
+    }
+
+    public void gotoLeftDistance(double target, double maxTime) {
+        gotoLeftDistance(0.3, target, maxTime);
+    }
+
+    public void gotoLeftDistance(double target) {
+        gotoLeftDistance( target, 3);
+    }
+
+
+
     // ---- THIS YEAR'S GAME ----
     // ---- THIS YEAR'S GAME ----
     // ---- THIS YEAR'S GAME ----
 
     public void faceTheProp(double str) {
+        faceTheProp(str, 1.5);
+    }
+
+    public void faceTheProp(double str, double maxTime) {
         boolean isLeft = false;
         boolean isRight = false;
 
-        // check left
-        if(leftDistance.doubleCheckDistance() <= 10) isLeft = true;
-        //check right
-        else if(rightDistance.doubleCheckDistance() <= 10) isRight = true;
-
+        ElapsedTime rt = new ElapsedTime();
+        while(!(isLeft || isRight) && rt.seconds() <= maxTime && opMode.opModeIsActive()) {
+            // check left
+            if(leftDistance.doubleCheckDistance() <= 10) isLeft = true;
+                //check right
+            else if(rightDistance.doubleCheckDistance() <= 10) isRight = true;
+            else drive(-0.1, 0.0, 0.0);
+        }
+        stop();
         // back up
         autonomouslyDriveByTime(0.1, 0.0, 0.0, 0.5);
 
         // turn to prop based on prev
         if(isLeft)
-            autonomouslyMove(str, -90, HowToMove.ROTATE_LEFT, 5);
+            autonomouslyMove(str, 90, HowToMove.ROTATE_LEFT, 5);
         else if(isRight)
-            autonomouslyMove(str, 90, HowToMove.ROTATE_RIGHT, 5);
+            autonomouslyMove(str, -90, HowToMove.ROTATE_RIGHT, 5);
+        else
+            autonomouslyDriveByTime(0.15, 0.0, 0.0, 1);
     }
 
     public void circleScanForProp(double str, HowToMove movement, double maxTime) {
@@ -383,7 +419,6 @@ public class MecanumDrive {
         double realStr = movement == HowToMove.ROTATE_LEFT ? -str : str;
         // Add timing? May not be required for this function
         ElapsedTime rt = new ElapsedTime();
-        //TODO: Use the left and right sensors to determine if it's left, right, or failing those, front
         while(rearDistance.getDistance() >= 8 && opMode.opModeIsActive() && rt.seconds() <= maxTime) {
             telemetry.addData("Rear Distance", rearDistance.getDistance());
             telemetry.addData("IMU Angle", imu.getZAngle());

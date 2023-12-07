@@ -31,36 +31,28 @@ public class RedLeftAuto extends LinearOpMode {
         waitForStart();
 
         // approach the prop
-        drive.gotoBackDistance(0.2, 21, 3);
-        drive.circleScanForProp(0.3, MecanumDrive.HowToMove.ROTATE_RIGHT, 8);
+        drive.gotoBackDistance(0.12, 24, 4);
 
-        // TODO: support completely robot-centric autonomous
-        drive.makeRobotCentric();
-
-        // nudge the pixel and hope we get our 20 points
-        // Forward is negative Mr. A...
-        drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 0.5);
-
-        // when you don't trust your code, do it twice
-        arm.goToPickUp();
+        drive.faceTheProp(0.3);
+        stop();
         arm.open();
-        sleep(500); // wait half a second
+        sleep(100);
 
-        // pack up the claw and scoot back
+        // lift claw to get out of the way
         arm.travelMode();
-        drive.autonomouslyDriveByTime(0.2, 0.0, 0.0, 0.5);
 
-        // center out
+        // This needs to be in field centric mode since it is going to go backwards regardless of what
+        // position the robot goes to in the faceTheProp method to avoid running over the prop.
+        drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 2);
+
+        // straighten out
         drive.goToZero();
 
-        // sprinkle a little extra complication on things for flavor
-        drive.makeFieldCentric();
-
-        // JOURNEY AROUND THE DIVIDER TO PARK
+        // back to wall the rest of the way
         drive.gotoBackDistance(4);
         drive.autonomouslyMove(0.2, 5, MecanumDrive.HowToMove.LEFT, 3);
-        drive.gotoBackDistance(50, 2); // move forward
-        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.RIGHT, 4);
+        drive.autonomouslyDriveByTime(-0.5 , 0.0, 0.0,2.65);
+        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.RIGHT, 5);
 
     }
 }
