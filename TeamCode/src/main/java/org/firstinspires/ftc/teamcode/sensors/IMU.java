@@ -1,3 +1,47 @@
+/*
+ * IMU Class - FTC Robot Inertial Measurement Unit
+ *
+ * This class represents the Inertial Measurement Unit (IMU) subsystem on an FTC robot. It uses the BNO055IMU hardware
+ * to measure orientation and velocity in three dimensions (X, Y, Z). The class provides methods to retrieve angles,
+ * angular velocities, and positions from the IMU.
+ *
+ * Author: [everyone who worked on it]
+ * Last Modified: 12/8/2023 12:01pm
+ * Version: [self explanatory but idk what it is]
+ *
+ * Class Hierarchy:
+ *   - IMU
+ *       - BNO055IMU
+ *
+ * Subsystem Assets:
+ *   - com.qualcomm.robotcore.hardware.IMU imu
+ *
+ * Methods:
+ *   Constructors:
+ *     - IMU(HardwareMap hardwareMap): Initializes the IMU subsystem with the BNO055IMU hardware. It takes the
+ *       HardwareMap as a parameter.
+ *
+ *   Orientation Commands:
+ *     - double getXAngle(): Retrieves the X angle of the internal IMU in the control panel.
+ *     - double getYAngle(): Retrieves the Y angle of the internal IMU in the control panel.
+ *     - double getZAngle(): Retrieves the Z angle of the internal IMU in the control panel.
+ *     - double[] getAngle(): Retrieves a double array, ordered XYZ, of the angle.
+ *
+ *   Velocity Commands:
+ *     - double getXVelocity(): Retrieves the X axis velocity of the control panel.
+ *     - double getYVelocity(): Retrieves the Y axis velocity of the control panel.
+ *     - double getZVelocity(): Retrieves the Z axis velocity of the control panel.
+ *     - double[] getVelocity(): Retrieves an ordered XYZ array of the control panel's current velocity.
+ *
+ *   Position Commands:
+ *     - double getXPosition(): Retrieves the X axis position of the control panel.
+ *     - double getYPosition(): Retrieves the Y axis position of the control panel.
+ *     - double getZPosition(): Retrieves the Z axis position of the control panel.
+ *     - double[] getPosition(): Retrieves an ordered XYZ array of the control panel's current position.
+ *
+ */
+
+
 package org.firstinspires.ftc.teamcode.sensors;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;

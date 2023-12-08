@@ -1,3 +1,45 @@
+/*
+ * PIDController Class - FTC Robot Proportional-Integral-Derivative (PID) Controller
+ *
+ * This class represents a PID controller for use in FTC (First Tech Challenge) robotics. The PID controller
+ * calculates the control signal based on the proportional, integral, and derivative components to minimize the
+ * error between the desired setpoint and the current system state.
+ *
+ * Author: [everyone who worked on it]
+ * Last Modified: 12:34pm
+ * Version: [slef explanatory but idk what it is]
+ *
+ * Constants:
+ *   - double PROPORTIONAL_CONSTANT: Proportional constant for the PID controller.
+ *   - double INTEGRAL_CONSTANT: Integral constant for the PID controller.
+ *   - double DERIVATIVE_CONSTANT: Derivative constant for the PID controller.
+ *
+ * Class Hierarchy:
+ *   - PIDController
+ *       - Telemetry
+ *       - ElapsedTime
+ *
+ * Fields:
+ *   - Telemetry telemetry: Telemetry instance for logging information.
+ *   - ElapsedTime runtime: ElapsedTime instance for measuring time intervals.
+ *   - double integralValue: Accumulated integral value for the PID controller.
+ *   - double lastError: Previous error value for calculating the derivative component.
+ *   - double finalError: Accumulated error value for telemetry reporting.
+ *   - String name: Identifier for telemetry logging purposes.
+ *
+ * Constructors:
+ *   - PIDController(Telemetry telemetry, String name): Initializes the PIDController with Telemetry and a name
+ *     for telemetry logging.
+ *
+ * Methods:
+ *   - void resetPID(): Resets the PID controller by clearing accumulated values and resetting runtime.
+ *   - double getPIDControlledValue(double current, double target): Calculates the control signal using the PID
+ *     algorithm and logs telemetry information.
+ *
+ * Note: Telemetry messages are added to provide debugging information during development and testing. They can
+ * be removed or modified for deployment.
+ */
+
 package org.firstinspires.ftc.teamcode.sensors;
 
 import android.os.Environment;

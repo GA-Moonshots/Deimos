@@ -1,3 +1,67 @@
+/*
+ * Arm Class - FTC Robot Robotic Arm Subsystem
+ *
+ * This class represents the robotic arm subsystem on an FTC robot.
+ * It includes methods for controlling the arm's movement, wrist, claw, and roll servo.
+ *
+ * Author: [everyone who worked on it]
+ * Last Modified: 12/8/2023 9:42am
+ * Version: [self explanatory, but idk what version it is]
+ *
+ * Class Hierarchy:
+ *   - LinearOpMode (import from com.qualcomm.robotcore.eventloop.opmode)
+ *     - Arm
+ *
+ * Subsystem Assets:
+ *   - Servo wristServo
+ *   - Servo openServo
+ *   - Servo rollServo
+ *   - DcMotor motor
+ *   - LinearOpMode opMode
+ *
+ * State Variables:
+ *   - double wristAng
+ *   - double rollPos
+ *   - boolean isOpen
+ *   - int offset
+ *   - enum RunState { GOTO_DROPOFF, GOTO_GROUND, NONE }
+ *
+ * Constants:
+ *   - Constants.WRIST_ON_GROUND
+ *   - Constants.ROLL_MAX
+ *   - Constants.ARM_MOTOR_NAME
+ *   - Constants.ARM_UP_POSITION
+ *   - Constants.ARM_DOWN_POSITION
+ *   - Constants.ARM_MOTOR_STRENGTH
+ *   - Constants.ROLL_SERVO_NAME
+ *   - Constants.CLAW_CLOSED_POS
+ *   - Constants.WRIST_ON_WALL
+ *   - Constants.ROLL_MIN
+ *   - Constants.WRIST_MIN
+ *   - Constants.WRIST_MAX
+ *   - Constants.WRIST_INC
+ *   - Constants.CLAW_OPEN_POS
+ *   - Constants.ROLL_INC
+ *
+ * Methods:
+ *   - Arm(LinearOpMode opMode): Constructor to initialize the arm subsystem.
+ *   - void move(double shoulderRot): Moves the arm based on the given shoulder rotation.
+ *   - boolean goToPickUp(): Moves the arm to the pickup position.
+ *   - boolean goToDropOff(): Moves the arm to the drop-off position.
+ *   - void travelMode(): Puts the arm in travel mode.
+ *   - void wristUp(): Moves the wrist up.
+ *   - void wristTo(double wristToMove): Moves the wrist to the specified position.
+ *   - void wristDown(): Moves the wrist down.
+ *   - void open(): Opens the claw.
+ *   - void close(): Closes the claw.
+ *   - void toggleOpen(): Toggles the claw between open and closed states.
+ *   - void toggleRoll(): Toggles the roll servo position.
+ *   - void rollPositive(): Increases the roll servo position.
+ *   - void rollNegative(): Decreases the roll servo position.
+ *   - String toString(): Provides a string representation of the arm's state.
+ *   - void changeOffset(int delta): Changes the encoder offset for motor position correction.
+ */
+
 package org.firstinspires.ftc.teamcode.systems;
 
 import androidx.annotation.NonNull;

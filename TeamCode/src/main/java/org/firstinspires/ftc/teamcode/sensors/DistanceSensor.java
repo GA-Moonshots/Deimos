@@ -1,3 +1,35 @@
+/*
+ * DistanceSensor Class - FTC Robot Distance Sensor
+ *
+ * This class represents the distance sensor subsystem on an FTC robot. It uses the Rev2mDistanceSensor hardware
+ * to measure distances in various units. The class provides methods to retrieve distance readings and offers a more
+ * reliable measurement by taking three readings and discarding any divergent values.
+ *
+ * Author: Michael, Mr. A
+ * Last Modified: 12/8/2023 11:39
+ * Version: 1.3.2.45
+ *
+ * Class Hierarchy:
+ *   - DistanceSensor
+ *       - Rev2mDistanceSensor
+ *
+ * Subsystem Assets:
+ *   - Rev2mDistanceSensor distanceSensor
+ *   - LinearOpMode opMode
+ *
+ * Methods:
+ *   Constructors:
+ *     - DistanceSensor(LinearOpMode opMode, String name): Initializes the DistanceSensor subsystem with the
+ *       Rev2mDistanceSensor hardware. It takes the LinearOpMode and the sensor name as parameters.
+ *
+ *   Distance Measurement Commands:
+ *     - double getDistance(): Retrieves the distance reading in inches.
+ *     - double doubleCheckDistance(): Retrieves a more reliable distance measurement by taking three readings
+ *       and discarding any divergent values. Returns the average distance after removing outliers.
+ *     - double getDistance(DistanceUnit unit): Retrieves the distance reading in the specified unit.
+ *
+ */
+
 package org.firstinspires.ftc.teamcode.sensors;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;

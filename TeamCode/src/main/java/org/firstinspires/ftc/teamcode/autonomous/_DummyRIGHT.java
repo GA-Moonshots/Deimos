@@ -15,13 +15,8 @@ public class _DummyRIGHT extends LinearOpMode {
         drive.makeRobotCentric();
 
         waitForStart();
+        drive.autonomouslyDriveByTime(0.0, -0.3, 0.0, 5);
 
-        //TODO: use a drivetrain method
-        ElapsedTime rt = new ElapsedTime();
-        if(opModeIsActive())
-            drive.drive(0.0, 0.3, 0.0);
-        while(opModeIsActive() && rt.seconds() <= 5)
-            sleep(1);
 
         drive.stop();
     }

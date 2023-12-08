@@ -1,3 +1,74 @@
+/*
+ * MecanumDrive Class - FTC Robot Mecanum Drive Subsystem
+ *
+ * This class represents the Mecanum drive subsystem on an FTC robot.
+ * It includes methods for controlling the Mecanum drive using encoders, gyroscope, and distance sensors.
+ *
+ * Author: Micheal + [everyone who worked on it]
+ * Last Modified: 12/8/2023 10:59am
+ * Version: [Self explanatory but idk what it is]
+ *
+ * Class Hierarchy:
+ *   - LinearOpMode (import from com.qualcomm.robotcore.eventloop.opmode)
+ *     - MecanumDrive
+ *
+ * Enums:
+ *   - AprilTagToAlign: LEFT, CENTER, RIGHT, NONE
+ *   - HowToMove: LEFT, RIGHT, BACK, ROTATE_LEFT, ROTATE_RIGHT
+ *
+ * Subsystem Assets:
+ *   - DcMotor leftFront
+ *   - DcMotor rightFront
+ *   - DcMotor leftBack
+ *   - DcMotor rightBack
+ *   - DistanceSensor rearDistance
+ *   - DistanceSensor leftDistance
+ *   - DistanceSensor rightDistance
+ *   - Camera camera
+ *   - IMU imu
+ *   - Telemetry telemetry
+ *   - double gyroTarget
+ *   - double runawayRobotShield
+ *   - double lastAprilTagYaw
+ *   - double lastAprilTagStrafe
+ *   - double fieldCentricTarget
+ *   - boolean isFieldCentric
+ *   - boolean isGyroLocked
+ *   - boolean isTargetSet
+ *
+ * Methods:
+ *   Constructors:
+ *     - MecanumDrive(LinearOpMode opMode): Initializes the Mecanum drive subsystem with sensors and motors.
+ *
+ *   State Commands:
+ *     - makeRobotCentric(): Switches the drive to robot-centric mode.
+ *     - makeFieldCentric(): Switches the drive to field-centric mode.
+ *     - toggleFieldCentric(): Toggles between field-centric and robot-centric modes.
+ *     - resetFieldCentricTarget(): Resets the field-centric target based on the gyroscope reading.
+ *     - postDistanceReadouts(): Displays distance sensor readings in telemetry.
+ *
+ *   Core Drive Commands:
+ *     - drive(double forward, double strafe, double turn): Drives the robot with mecanum wheels using specified inputs.
+ *     - stop(): Stops the drive from moving.
+ *
+ *   Autonomous Drive Commands:
+ *     - autonomouslyDriveByTime(double forward, double strafe, double turn, double time): Drives autonomously for a specified time.
+ *     - autonomouslyMove(double strength, double target, HowToMove side, double maxTime): Moves autonomously based on sensor feedback.
+ *     - maintainStrafe(DistanceSensor sensor, double strength, double target): Feedback loop for maintaining lateral position.
+ *     - maintainForward(DistanceSensor sensor, double strength, double target): Feedback loop for maintaining forward position.
+ *     - maintainTurn(double strength, double target): Feedback loop for maintaining robot's orientation.
+ *
+ *   Friendly Autonomous Pass-Through Commands:
+ *     - gotoBackDistance(double str, double target, double maxTime): Moves backward autonomously to a specified distance.
+ *     - gotoRightDistance(double str, double target, double maxTime): Moves right autonomously to a specified distance.
+ *     - gotoLeftDistance(double str, double target, double maxTime): Moves left autonomously to a specified distance.
+ *
+ *   This Year's Game Commands:
+ *     - faceTheProp(double str): Turns the robot to face a prop based on sensor readings.
+ *     - circleScanForProp(double str, HowToMove movement, double maxTime): Scans in a circular motion to locate a prop.
+ *
+ */
+
 package org.firstinspires.ftc.teamcode.systems;
 
 import androidx.annotation.NonNull;

@@ -1,3 +1,35 @@
+/*
+ * TestMode Class - FTC Robot Test OpMode
+ *
+ * This class represents a test OpMode for a FTC (First Tech Challenge) robot. The OpMode allows
+ * testing of various robot subsystems, including MecanumDrive, PIDController, and Elevator.
+ *
+ * Author: [Everyone who worked on it]
+ * Last Modified: 12/8/2023 12:53pm
+ * Version: [self explanatory but idk what it is]
+ *
+ * Class Hierarchy:
+ *   - TestMode
+ *       - LinearOpMode
+ *       - MecanumDrive
+ *       - PIDController
+ *       - Elevator
+ *       - Arm
+ *       - Camera
+ *
+ * Fields:
+ *   - MecanumDrive drive: MecanumDrive instance for controlling the robot's mecanum drive system.
+ *
+ * Methods:
+ *   - runOpMode(): Entry point for the OpMode, where specific test methods can be called.
+ *   - driveTest(): Method for testing the mecanum drive system and IMU angles.
+ *   - pidTest(): Method for testing the PID controller with the mecanum drive system.
+ *   - elevatorTest(): Method for testing the elevator system and mecanum drive integration.
+ *
+ * Note: The OpMode contains specific test methods for different robot subsystems. The selected test
+ * method can be changed in the runOpMode() method.
+ */
+
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;

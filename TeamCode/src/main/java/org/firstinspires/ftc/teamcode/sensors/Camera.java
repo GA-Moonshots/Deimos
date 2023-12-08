@@ -1,3 +1,36 @@
+/*
+ * Camera Class - FTC Robot Camera Sensor
+ *
+ * This class represents the camera sensor subsystem on an FTC robot. It utilizes the AprilTag vision processing library
+ * to detect AprilTags and obtain distance and angle information. The Camera class interfaces with the VisionPortal to access
+ * camera controls and process AprilTag detections.
+ *
+ * Author: Michael, Vincent, Gabe, Mr, A
+ * Last Modified: 12/8/2023 11:17am
+ * Version: 0.1.1.0
+ *
+ * Class Hierarchy:
+ *   - Camera
+ *       - AprilTagProcessor
+ *       - VisionPortal
+ *
+ * Subsystem Assets:
+ *   - AprilTagProcessor aprilTag
+ *   - VisionPortal visionPortal
+ *
+ * Methods:
+ *   Constructors:
+ *     - Camera(HardwareMap hardwareMap, Telemetry telemetry): Initializes the Camera subsystem with the AprilTag processor
+ *       and VisionPortal for camera control and processing.
+ *
+ *   Detection Commands:
+ *     - List<AprilTagDetection> getDetections(): Obtains a list of AprilTag detections from the camera.
+ *
+ *   Status Commands:
+ *     - String getStatus(): Gets the current status of the camera, indicating whether it is streaming or not.
+ *
+ */
+
 package org.firstinspires.ftc.teamcode.sensors;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;

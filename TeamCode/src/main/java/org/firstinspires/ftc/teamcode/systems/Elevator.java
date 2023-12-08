@@ -1,3 +1,41 @@
+/*
+ * Elevator Class - FTC Robot Elevator Subsystem
+ *
+ * This class represents the elevator subsystem on an FTC robot.
+ * It includes methods for controlling the elevator's movement and locking mechanism.
+ *
+ * Author: [everyone who worked on it]
+ * Last Modified: 12/8/2023 10:07am
+ * Version: [self explanatory, but idk what version it is]
+ *
+ * Class Hierarchy:
+ *   - LinearOpMode (import from com.qualcomm.robotcore.eventloop.opmode)
+ *     - Elevator
+ *
+ * Subsystem Assets:
+ *   - DcMotor motor
+ *   - LinearOpMode opMode
+ *   - Servo leftServo
+ *   - Servo rightServo
+ *
+ * State Variables:
+ *   - boolean isLocked
+ *
+ * Constants:
+ *   - Constants.ELEVATOR_MOTOR_NAME
+ *   - Constants.ELEVATOR_LEFT_SERVO_NAME
+ *   - Constants.ELEVATOR_RIGHT_SERVO_NAME
+ *   - Constants.LOCK_OFF_POSITION
+ *   - Constants.LOCK_ON_POSITION
+ *   - Constants.ELEVATOR_MAX_SPEED
+ *
+ * Methods:
+ *   - Elevator(LinearOpMode opMode): Constructor to initialize the elevator subsystem.
+ *   - void move(double str): Moves the elevator based on the given power.
+ *   - void toggleLock(): Toggles the lock mechanism on/off.
+ *   - void stop(): Stops the elevator motor.
+ */
+
 package org.firstinspires.ftc.teamcode.systems;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;

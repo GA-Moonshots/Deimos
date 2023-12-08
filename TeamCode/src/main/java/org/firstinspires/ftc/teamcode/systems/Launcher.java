@@ -1,3 +1,32 @@
+/*
+ * Launcher Class - FTC Robot Launcher Subsystem
+ *
+ * This class represents the launcher subsystem on an FTC robot.
+ * It includes methods for controlling the launcher's servo to release or lock the mechanism.
+ *
+ * Author: Ed + Stacy + [everyone who worked on it]
+ * Last Modified: 12/8/2023 10:13am
+ * Version: 2.0
+ *
+ * Class Hierarchy:
+ *   - LinearOpMode (import from com.qualcomm.robotcore.eventloop.opmode)
+ *     - Launcher
+ *
+ * Subsystem Assets:
+ *   - LinearOpMode opMode
+ *   - Servo servo
+ *
+ * Constants:
+ *   - Constants.LAUNCHER_SERVO_NAME
+ *   - Launcher.OPENED_POSITION
+ *   - Launcher.CLOSED_POSITION
+ *
+ * Methods:
+ *   - Launcher(LinearOpMode opMode): Constructor to initialize the launcher subsystem.
+ *   - void release(): Moves the launcher servo to the opened position.
+ *   - void lock(): Moves the launcher servo to the closed position.
+ */
+
 package org.firstinspires.ftc.teamcode.systems;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;

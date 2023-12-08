@@ -1,3 +1,47 @@
+/*
+ * Deimos Class - FTC Robot TeleOp OpMode
+ *
+ * This class represents the TeleOp OpMode for a FTC (First Tech Challenge) robot named "Deimos."
+ * The TeleOp mode allows for manual control of various robot subsystems, including the MecanumDrive,
+ * Arm, Elevator, and Launcher.
+ *
+ * Author: [everyone who worked on it]
+ * Last Modified: 12/8/2023 1:07pm
+ * Version: [self explanatory but idk what it is]
+ *
+ * Class Hierarchy:
+ *   - Deimos
+ *       - LinearOpMode
+ *       - MecanumDrive
+ *       - Arm
+ *       - Elevator
+ *       - Launcher
+ *
+ * Fields:
+ *   - Arm arm: Arm instance for controlling the robot's arm subsystem.
+ *   - MecanumDrive drive: MecanumDrive instance for controlling the robot's mecanum drive system.
+ *   - Elevator elevator: Elevator instance for controlling the robot's elevator subsystem.
+ *   - Launcher launcher: Launcher instance for controlling the robot's launcher subsystem.
+ *   - double lastTime: Variable to store the last time value for calculating update rates.
+ *   - ElapsedTime timer: ElapsedTime instance for tracking time intervals.
+ *   - MecanumDrive.AprilTagToAlign align: Variable to store the April Tag alignment status.
+ *   - Arm.RunState armState: Variable to store the current state of the arm.
+ *   - boolean gp1aPressed: Toggle variable to avoid double-pressing the 'A' button on gamepad 1.
+ *   - boolean gp1bPressed: Toggle variable to avoid double-pressing the 'B' button on gamepad 1.
+ *   - boolean gp2aPressed: Toggle variable to avoid double-pressing the 'A' button on gamepad 2.
+ *   - boolean gp2bPressed: Toggle variable to avoid double-pressing the 'B' button on gamepad 2.
+ *   - boolean gp2xPressed: Toggle variable to avoid double-pressing the 'X' button on gamepad 2.
+ *   - boolean gp2yPressed: Toggle variable to avoid double-pressing the 'Y' button on gamepad 2.
+ *   - boolean gp2rbPressed: Toggle variable to avoid double-pressing the right bumper on gamepad 2.
+ *
+ * Methods:
+ *   - runOpMode(): Entry point for the TeleOp OpMode, where manual control is provided to the driver.
+ *   - driver1Inputs(): Method handling inputs from gamepad 1, mainly for drivetrain control.
+ *   - driver2Inputs(): Method handling inputs from gamepad 2, including arm, elevator, and launcher controls.
+ *
+ * Note: This OpMode includes two driver control methods, one for each gamepad, to provide clarity and organization.
+ */
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
