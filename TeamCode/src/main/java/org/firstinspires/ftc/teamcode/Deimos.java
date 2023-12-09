@@ -137,11 +137,13 @@ public class Deimos extends LinearOpMode {
 
         // B BUTTON: available
         if (gamepad1.b && !gp1bPressed && !gamepad2.start) {
-
         }
         gp1bPressed = gamepad1.b; // this structure avoids double press
 
         // X BUTTON: available
+        if(gamepad1.x){
+            drive.resetFieldCentricTarget();
+        }
 
         // Y BUTTON : available
 
@@ -179,7 +181,7 @@ public class Deimos extends LinearOpMode {
             if (Math.abs(strafe) <= Constants.INPUT_THRESHOLD)  strafe = 0.0d;
             if (Math.abs(turn) <= Constants.INPUT_THRESHOLD) turn = 0.0d;
 
-            drive.drive(forward * speedMod, strafe, turn);
+            drive.drive(forward * speedMod, strafe * speedMod, turn * speedMod);
         }
 
     }

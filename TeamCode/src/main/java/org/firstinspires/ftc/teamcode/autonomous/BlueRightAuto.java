@@ -31,10 +31,10 @@ public class BlueRightAuto extends LinearOpMode {
         waitForStart();
 
         // approach the prop
-        drive.gotoBackDistance(0.125, 24, 4);
+        drive.gotoBackDistance(0.13, 24, 4);
 
-        drive.faceTheProp(0.3);
-        stop();
+        drive.faceTheProp(0.3,2);
+        drive.stop();
         arm.open();
         sleep(100);
 
@@ -43,7 +43,7 @@ public class BlueRightAuto extends LinearOpMode {
 
         // This needs to be in field centric mode since it is going to go backwards regardless of what
         // position the robot goes to in the faceTheProp method to avoid running over the prop.
-        drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 2);
+        drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 1.9);
 
         // straighten out
         drive.goToZero();
@@ -51,9 +51,11 @@ public class BlueRightAuto extends LinearOpMode {
         // back to wall the rest of the way
         drive.gotoBackDistance(4);
 
-        drive.autonomouslyMove(0.15, 6, MecanumDrive.HowToMove.RIGHT, 3);
-        drive.autonomouslyDriveByTime(-0.5 , 0.0, 0.0,2.65);
-        drive.autonomouslyMove(0.7, 7, MecanumDrive.HowToMove.LEFT, 5);
+        drive.autonomouslyMove(0.2, 5, MecanumDrive.HowToMove.RIGHT, 3);
+        drive.autonomouslyDriveByTime(-0.5 , 0.0, 0.0,2.5);
+        drive.goToZero();
+        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.LEFT, 5);
+        drive.autonomouslyDriveByTime(.2,0.0,0.0,1.0);
 
     }
 }

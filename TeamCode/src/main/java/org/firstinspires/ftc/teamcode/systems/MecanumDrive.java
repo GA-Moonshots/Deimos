@@ -399,7 +399,7 @@ public class MecanumDrive {
      */
     protected boolean maintainTurn(double strength, double target) {
         // Wrap target
-        target %= 360;
+        target %= 180;
 
         if(Math.abs(imu.getZAngle() - target) <= Constants.ANGLE_THRESHOLD) {
             stop();
@@ -474,15 +474,18 @@ public class MecanumDrive {
         }
         stop();
         // back up
-        autonomouslyDriveByTime(0.1, 0.0, 0.0, 0.5);
+        autonomouslyDriveByTime(0.1, 0.0, 0.0, 0.3);
 
         // turn to prop based on prev
-        if(isLeft)
+        if(isLeft) {
             autonomouslyMove(str, 90, HowToMove.ROTATE_LEFT, 5);
-        else if(isRight)
+            autonomouslyDriveByTime(0.0, -0.1, 0.0, 0.2);
+        } else if(isRight) {
             autonomouslyMove(str, -90, HowToMove.ROTATE_RIGHT, 5);
-        else
+            autonomouslyDriveByTime(0.0, 0.1, 0.0, 0.2);
+        } else {
             autonomouslyDriveByTime(0.15, 0.0, 0.0, 1);
+        }
     }
 
     public void circleScanForProp(double str, HowToMove movement, double maxTime) {
