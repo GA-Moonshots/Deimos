@@ -33,7 +33,7 @@ public class RedLeftAuto extends LinearOpMode {
         // approach the prop
         drive.gotoBackDistance(0.115, 24, 4);
 
-        drive.faceTheProp(0.3, 2);
+        MecanumDrive.AprilTagToAlign align = drive.faceTheProp(0.3, 2);
         stop();
         arm.open();
         sleep(100);
@@ -41,12 +41,24 @@ public class RedLeftAuto extends LinearOpMode {
         // lift claw to get out of the way
         arm.travelMode();
 
+        if(align == MecanumDrive.AprilTagToAlign.CENTER) {
+            // Move left before going forward
+        } else {
+            // If we are facing left we are already facing the correct way
+            double turn = (align == MecanumDrive.AprilTagToAlign.LEFT) ? 0.0 : -0.4;
+            // Simply go straight ahead
+            drive.autonomouslyDriveByTime(-0.5, 0.0, 0.0, 1.25);
+            drive.autonomouslyDriveByTime(0.0, 0.5, turn, 3.5);
+        }
+        drive.gotoAngle(90);
+
+        // Raise the arm somewhere in here?
+        terminateOpModeNow();
+
         // This needs to be in field centric mode since it is going to go backwards regardless of what
         // position the robot goes to in the faceTheProp method to avoid running over the prop.
         drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 1.9);
 
-        // straighten out
-        drive.goToZero();
 
         // back to wall the rest of the way
         drive.gotoBackDistance(4);

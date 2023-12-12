@@ -31,7 +31,7 @@ public class RedRightAuto extends LinearOpMode {
         waitForStart();
 
         // approach the prop
-        drive.gotoBackDistance(0.11, 26, 4);
+        drive.gotoBackDistance(0.11, 24, 4);
 
         drive.faceTheProp(0.3);
         stop();

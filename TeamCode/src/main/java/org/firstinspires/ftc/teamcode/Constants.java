@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 public class Constants {
     // ----ARM VARIABLES----
     // ----ARM VARIABLES----
-    public static final int ARM_UP_POSITION = -1400;
+    public static final int ARM_UP_POSITION = -1000;
     public static final int ARM_DOWN_POSITION = 0;
     public static final double ARM_MOTOR_STRENGTH = 0.9;
     public static final double WRIST_ON_WALL =  0.6;

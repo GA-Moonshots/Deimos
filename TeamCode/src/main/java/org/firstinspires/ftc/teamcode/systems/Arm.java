@@ -92,6 +92,7 @@ public class Arm {
     public enum RunState {
         GOTO_DROPOFF,
         GOTO_GROUND,
+        GOTO_LOW,
         NONE
     }
 

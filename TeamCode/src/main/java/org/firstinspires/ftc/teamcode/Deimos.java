@@ -109,9 +109,9 @@ public class Deimos extends LinearOpMode {
         while(opModeIsActive()) {
             telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
-            //telemetry.addData("UPS", 1 / (timer.seconds() - lastTime));
+            telemetry.addData("UPS", 1 / (timer.seconds() - lastTime));
             telemetry.addData("Camera:", drive.camera.getStatus());
-            //lastTime = timer.seconds();
+            lastTime = timer.seconds();
 
             // Driver 1: Responsible for drivetrain and movement
             if(opModeIsActive()) driver1Inputs();
@@ -141,11 +141,16 @@ public class Deimos extends LinearOpMode {
         gp1bPressed = gamepad1.b; // this structure avoids double press
 
         // X BUTTON: available
-        if(gamepad1.x){
+
+        // Y BUTTON : Reset Field Centric Target
+        if(gamepad1.y){
             drive.resetFieldCentricTarget();
         }
 
-        // Y BUTTON : available
+
+        if(gamepad1.right_trigger >= Constants.INPUT_THRESHOLD){
+            launcher.release();
+        }
 
         // DPAD: align to April Tag
         boolean dpadUpPressed = (gamepad1.dpad_up && !gamepad1.dpad_down);
@@ -217,6 +222,9 @@ public class Deimos extends LinearOpMode {
             armState = Arm.RunState.NONE;
         gp2yPressed = gamepad2.y;
 
+        if(gamepad2.right_trigger >= Constants.INPUT_THRESHOLD &&  armState != Arm.RunState.GOTO_DROPOFF) {
+
+        }
         if(armState == Arm.RunState.GOTO_DROPOFF) {
             if (arm.goToDropOff())
                 armState = Arm.RunState.NONE;
@@ -226,15 +234,13 @@ public class Deimos extends LinearOpMode {
                 armState = Arm.RunState.NONE;
             return;
         }
-        if(gamepad2.right_trigger >= Constants.INPUT_THRESHOLD){
-            launcher.release();
-        }
 
 
         if(gamepad2.right_bumper && !gp2rbPressed) {
             elevator.toggleLock();
         }
         gp2rbPressed = gamepad2.right_bumper;
+
 
         // DPAD VERTICAL: wrist
         if(gamepad2.dpad_up && !gamepad2.dpad_down) {
