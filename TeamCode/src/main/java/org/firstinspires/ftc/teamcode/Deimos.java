@@ -80,6 +80,7 @@ public class Deimos extends LinearOpMode {
     private boolean gp2yPressed = false;
     private boolean gp2rbPressed = false;
     private boolean gp2lbPressed = false;
+    private boolean gp2rtPressed = false;
     
     @Override
     public void runOpMode() {
@@ -222,9 +223,14 @@ public class Deimos extends LinearOpMode {
             armState = Arm.RunState.NONE;
         gp2yPressed = gamepad2.y;
 
-        if(gamepad2.right_trigger >= Constants.INPUT_THRESHOLD &&  armState != Arm.RunState.GOTO_DROPOFF) {
-
+        if(gamepad2.right_trigger >= Constants.INPUT_THRESHOLD && !gp2rtPressed && armState != Arm.RunState.GOTO_DROPOFF) {
+            armState = Arm.RunState.GOTO_LOW;
+        } else if(gamepad2.right_trigger >= Constants.INPUT_THRESHOLD && !gp2rtPressed) {
+            armState = Arm.RunState.NONE;
         }
+        gp2rtPressed = gamepad2.right_trigger >= Constants.INPUT_THRESHOLD;
+
+
         if(armState == Arm.RunState.GOTO_DROPOFF) {
             if (arm.goToDropOff())
                 armState = Arm.RunState.NONE;
@@ -233,6 +239,8 @@ public class Deimos extends LinearOpMode {
             if (arm.goToPickUp())
                 armState = Arm.RunState.NONE;
             return;
+        } else if(armState == Arm.RunState.GOTO_LOW) {
+            //arm.
         }
 
 

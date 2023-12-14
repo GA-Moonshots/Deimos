@@ -11,6 +11,7 @@ public class Autonomous extends LinearOpMode {
     private boolean isLeft = false;
     private boolean isRed = false;
     private boolean goForBoard = false;
+    private boolean gotoInside = false;
 
     private MecanumDrive drive;
     private Arm arm;
@@ -80,10 +81,7 @@ public class Autonomous extends LinearOpMode {
         // back up to the wall the rest of the way
         drive.gotoBackDistance(4);
 
-        // park for 5 points
-        drive.autonomouslyMove(0.3, 5,
-                isRed ? MecanumDrive.HowToMove.RIGHT : MecanumDrive.HowToMove.LEFT,
-                4.75);
+
     }
 
     public void far() {
@@ -102,10 +100,16 @@ public class Autonomous extends LinearOpMode {
     }
 
     public void parkInside() {
-
+        // park for 5 points
+        drive.autonomouslyMove(0.3, 5,
+                isRed ? MecanumDrive.HowToMove.RIGHT : MecanumDrive.HowToMove.LEFT,
+                4.75);
     }
 
     public void parkOutside() {
-
+        drive.makeRobotCentric();
+        drive.gotoBackDistance(5);
+        drive.makeFieldCentric();
+        drive.autonomouslyDriveByTime(0.1, 0.0, 0.0, 2);
     }
 }
