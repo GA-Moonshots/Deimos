@@ -43,6 +43,7 @@ public class RedLeftAuto extends LinearOpMode {
 
         if(align == MecanumDrive.AprilTagToAlign.CENTER) {
             // Move left before going forward
+            drive.gotoLeftDistance(10);
         } else {
             // If we are facing left we are already facing the correct way
             double turn = (align == MecanumDrive.AprilTagToAlign.LEFT) ? 0.0 : -0.4;
@@ -53,12 +54,11 @@ public class RedLeftAuto extends LinearOpMode {
         drive.gotoAngle(90);
 
         // Raise the arm somewhere in here?
-        terminateOpModeNow();
 
+        terminateOpModeNow();
         // This needs to be in field centric mode since it is going to go backwards regardless of what
         // position the robot goes to in the faceTheProp method to avoid running over the prop.
         drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 1.9);
-
 
         // back to wall the rest of the way
         drive.gotoBackDistance(4);

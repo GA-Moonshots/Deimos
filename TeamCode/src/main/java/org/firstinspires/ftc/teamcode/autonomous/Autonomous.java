@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Red - RIGHT")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous")
 public class Autonomous extends LinearOpMode {
     private boolean isLeft = false;
     private boolean isRed = false;
@@ -25,48 +25,49 @@ public class Autonomous extends LinearOpMode {
 
         while(opModeInInit()) {
             // Set side of field (left/right, red/blue)
-            if(gamepad1.dpad_left)
+            if (gamepad1.dpad_left)
                 isLeft = true;
-            else if(gamepad1.dpad_right)
+            else if (gamepad1.dpad_right)
                 isLeft = false;
 
-            if(gamepad1.x)
+            if (gamepad1.x)
                 isRed = false;
-            else if(gamepad1.b && !gamepad1.start)
+            else if (gamepad1.b && !gamepad1.start)
                 isRed = true;
 
             // Should we go for 45 points instead of 25?
-            if(gamepad1.y)
+            if (gamepad1.y)
                 goForBoard = true;
-            else if(gamepad1.a && !gamepad1.start)
+            else if (gamepad1.a && !gamepad1.start)
                 goForBoard = false;
 
             telemetry.addData("Position", "%s Team, %s Side", isRed ? "Red" : "Blue", isLeft ? "Left" : "Right");
             telemetry.addData("Target Points", "%s", goForBoard ? "45" : "25");
+            telemetry.update();
+        }
 
-            // approach the prop
-            drive.gotoBackDistance(0.115, 24, 4);
+        // approach the prop
+        drive.gotoBackDistance(0.115, 24, 4);
 
-            align = drive.faceTheProp(0.3, 2);
-            stop();
-            arm.open();
-            sleep(100);
+        align = drive.faceTheProp(0.3, 2);
+        stop();
+        arm.open();
+        sleep(100);
 
-            // lift claw to get out of the way
-            arm.travelMode();
+        // lift claw to get out of the way
+        arm.travelMode();
 
-            if((isLeft && !isRed) || (!isLeft && isRed)) {
-                near();
-            } else {
-                far();
-            }
-            // align
+        if((isLeft && !isRed) || (!isLeft && isRed)) {
+            near();
+        } else {
+            far();
+        }
+        // align
 
-            if((isLeft && !isRed) || (!isLeft && isRed)) {
-                parkInside();
-            } else {
-                parkOutside();
-            }
+        if((isLeft && !isRed) || (!isLeft && isRed)) {
+            parkInside();
+        } else {
+            parkOutside();
         }
     }
 
