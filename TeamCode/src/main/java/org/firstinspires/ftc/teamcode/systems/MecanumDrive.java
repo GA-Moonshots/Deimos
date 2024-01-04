@@ -271,7 +271,7 @@ public class MecanumDrive {
     /**
      * Rotates robot to its imu's 0 degree heading adjusted by fieldCentricTarget
      */
-    public void goToZero() {
+    public void goToZeroAngle() {
         while (Math.abs(imu.getZAngle() - fieldCentricTarget) >= 2 && opMode.opModeIsActive()) {
             drive(0.0, 0.0, 0.7 * Math.toRadians(imu.getZAngle() - fieldCentricTarget));
         }

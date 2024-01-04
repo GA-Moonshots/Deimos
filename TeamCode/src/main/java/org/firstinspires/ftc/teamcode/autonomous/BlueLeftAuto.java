@@ -46,7 +46,7 @@ public class BlueLeftAuto extends LinearOpMode {
         drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 2);
 
         // straighten out
-        drive.goToZero();
+        drive.goToZeroAngle();
 
         // back to wall the rest of the way
         drive.gotoBackDistance(4);

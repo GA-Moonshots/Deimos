@@ -64,7 +64,7 @@ public class RedLeftAuto extends LinearOpMode {
         drive.gotoBackDistance(4);
         drive.autonomouslyMove(0.2, 5, MecanumDrive.HowToMove.LEFT, 3);
         drive.autonomouslyDriveByTime(-0.5 , 0.0, 0.0,2.5);
-        drive.goToZero();
+        drive.goToZeroAngle();
         drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.RIGHT, 5);
         drive.autonomouslyDriveByTime(.2,0.0,0.0,1.0);
 
