@@ -85,7 +85,7 @@ public class Arm {
     private LinearOpMode opMode;
 
     // STATE VARIABLES
-    private double wristAng = Constants.WRIST_ON_GROUND;
+    private double wristAng = Constants.WRIST_MIN;
     private double rollPos = Constants.ROLL_MAX;
     private boolean isOpen = false;
     private int offset = 0;

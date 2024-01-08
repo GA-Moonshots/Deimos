@@ -38,9 +38,9 @@ public class Launcher {
     private LinearOpMode opMode;
     // static variables can't go in the method, must go at top
     // the position of the motor when opened
-    public static final double OPENED_POSITION = 0;
+    public static final double OPENED_POSITION = 0.5;
     // the position of the motor when closed
-    public static final double CLOSED_POSITION = 1;
+    public static final double CLOSED_POSITION = 0;
     // these types are all caps "POWER" - standard
 
     /*

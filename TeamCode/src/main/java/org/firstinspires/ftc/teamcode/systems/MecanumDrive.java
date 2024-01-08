@@ -341,7 +341,7 @@ public class MecanumDrive {
      */
     protected boolean maintainStrafe(DistanceSensor sensor, double strength, double target) {
         // note the current distance
-        double distance = sensor.getDistance();
+        double distance = sensor.doubleCheckDistance();
 
         // one-time, initial determination if we're approaching or leaving the wall
         if(runawayRobotShield == -1) {
@@ -372,7 +372,7 @@ public class MecanumDrive {
      */
     protected boolean maintainForward(DistanceSensor sensor, double strength, double target) {
         // note the current distance
-        double distance = sensor.getDistance();
+        double distance = sensor.doubleCheckDistance();
 
         // one-time, initial determination if we're approaching or leaving the wall
         if(runawayRobotShield == -1) {

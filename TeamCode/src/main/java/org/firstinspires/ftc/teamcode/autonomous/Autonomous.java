@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Const;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 
@@ -10,7 +12,7 @@ public class Autonomous extends LinearOpMode {
     private boolean isLeft = false;
     private boolean isRed = false;
     private boolean goForBoard = false;
-    private boolean gotoInside = false;
+    private boolean gotoOpposite = false;
 
     private MecanumDrive drive;
     private Arm arm;
@@ -49,6 +51,7 @@ public class Autonomous extends LinearOpMode {
 
         //force field centric
         drive.makeFieldCentric();
+        arm.wristTo(Constants.WRIST_ON_GROUND);
         // approach the prop
         drive.gotoBackDistance(0.115, 24, 4);
 
@@ -84,49 +87,68 @@ public class Autonomous extends LinearOpMode {
 
         // back up to the wall the rest of the way
         drive.gotoBackDistance(4);
-
-
     }
 
     public void far() {
-        // If we are facing left we are already facing the correct way
-        double turn = 0.4d;
-
-        if(align == MecanumDrive.AprilTagToAlign.LEFT && isRed) {
-            turn = 0.0d;
-        } else if(align == MecanumDrive.AprilTagToAlign.RIGHT && !isRed) {
-            turn = 0.0d;
+        drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 2);
+        drive.goToZeroAngle();
+        if(gotoOpposite) {
+            drive.gotoBackDistance(0.15, 8, 3.5);
+            drive.autonomouslyDriveByTime(0.0, -0.2, 0.0, 4);
+            if(isRed)
+                drive.gotoRightDistance(20);
+            else
+                drive.gotoLeftDistance(20);
+        } else {
+            drive.gotoBackDistance(15);
+            stop();
+            double targetDistance;
+            if(isRed)
+                targetDistance = drive.leftDistance.doubleCheckDistance();
+            else
+                targetDistance = drive.rightDistance.doubleCheckDistance();
+            if(align != MecanumDrive.AprilTagToAlign.LEFT) {
+                // Store the current distance for the next piece
+                // Move left before going forward
+                if(isRed)
+                    drive.gotoLeftDistance(10);
+                else
+                    drive.gotoRightDistance(10);
+            } else {
+                if(isRed) {
+                    drive.gotoLeftDistance(8);
+                } else {
+                    drive.gotoRightDistance(8);
+                }
+            }
+            drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 5);
+            if(align != MecanumDrive.AprilTagToAlign.LEFT) {
+                if(isRed)
+                    drive.gotoLeftDistance(targetDistance);
+                else
+                    drive.gotoRightDistance(targetDistance);
+            }
+            stop();
+            drive.autonomouslyDriveByTime(0.0, isRed ? 0.4 : -0.4, 0.0, 4);
         }
-
-        double multiplier = isRed ? 1 : -1;
-
-        if(align == MecanumDrive.AprilTagToAlign.CENTER) {
-            // Store the current distance for the next piece
-            double targetLeftDistance = drive.leftDistance.getDistance();
-            // Move left before going forward
-            drive.gotoLeftDistance(10);
-            drive.gotoLeftDistance(targetLeftDistance);
-        }
-
-        drive.autonomouslyDriveByTime(-0.5, 0.0, 0.0, 1.25);
-        // Cheat and turn at the same time
-        drive.autonomouslyDriveByTime(0.0, multiplier * 0.5, multiplier * turn, 3.5);
-
-        drive.gotoAngle(90 * multiplier);
     }
 
     public void parkInside() {
         // park for 5 points
         drive.autonomouslyMove(0.3, 5,
-                //boolean statement ? is boolean true : is if false
+                //boolean statement ? if true : if false
                 isRed ? MecanumDrive.HowToMove.RIGHT : MecanumDrive.HowToMove.LEFT,
                 4.75);
     }
 
     public void parkOutside() {
-        drive.makeRobotCentric();
-        drive.gotoBackDistance(5);
-        drive.makeFieldCentric();
-        drive.autonomouslyDriveByTime(0.1, 0.0, 0.0, 2);
+        if(gotoOpposite)
+            drive.autonomouslyDriveByTime(-0.3, 0.0, 0.0, 3.75);
+        drive.goToZeroAngle();
+        if(isRed)
+            drive.gotoRightDistance(4);
+        else
+            drive.gotoLeftDistance(4);
+        drive.autonomouslyDriveByTime(0.1, 0.0, 0.0, 1);
     }
 }

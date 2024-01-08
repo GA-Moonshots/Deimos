@@ -151,6 +151,7 @@ public class Deimos extends LinearOpMode {
 
         if(gamepad1.right_trigger >= Constants.INPUT_THRESHOLD){
             launcher.release();
+
         }
 
         // DPAD: align to April Tag
