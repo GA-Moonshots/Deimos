@@ -26,6 +26,7 @@ public class Constants {
     public static final double APRIL_TAG_DISTANCE_TARGET = 5;
     public static final double APRIL_TAG_PRECISION = 10;
     public static final double APRIL_TAG_MAX_SPEED = 0.3;
+    public static final double GYRO_BOOST_FACTOR = 5;
 
     // Generalized minimum input for the robot to respond to controller input
     public static final double INPUT_THRESHOLD = 0.1;

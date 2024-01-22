@@ -70,8 +70,10 @@ public class Autonomous extends LinearOpMode {
         }
         // align
 
-        if((isLeft && !isRed) || (!isLeft && isRed)) {
+        if(!goForBoard && ((isLeft && !isRed) || (!isLeft && isRed))) {
             parkInside();
+        } else if (goForBoard) {
+            parkBoard();
         } else {
             parkOutside();
         }
@@ -139,6 +141,16 @@ public class Autonomous extends LinearOpMode {
                 //boolean statement ? if true : if false
                 isRed ? MecanumDrive.HowToMove.RIGHT : MecanumDrive.HowToMove.LEFT,
                 4.75);
+    }
+
+    public void parkBoard() {
+        // align to april tag
+
+        // place pixel
+
+        // drop arm
+
+        // if inside, move out of the way, if outside, the time is too close
     }
 
     public void parkOutside() {

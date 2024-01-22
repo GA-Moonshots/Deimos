@@ -37,18 +37,19 @@ public class AprilTagAuto extends LinearOpMode {
 
         while(opModeIsActive()){
 
+            // fix angle
+
             target = fetchTarget();
 
 
-            // pull our desired target from detections
-
+            // pull our desired target from detections and do strafe
             if(target != null){
                 updateTargetTelemetry(target);
 
                 // fix our delta x value for alignment
-                while(opModeIsActive() && target.ftcPose.x < -2){
+                while(opModeIsActive() && Math.abs(target.ftcPose.x) > 1){
                     drive.makeRobotCentric();
-                    drive.drive(0.0,0.2,0.0);
+                    drive.drive(0.0,-target.ftcPose.x / 10,0.0);
                 }
                 drive.stop();
 
@@ -57,15 +58,10 @@ public class AprilTagAuto extends LinearOpMode {
                 System.out.println("lmao sorry");
             }
 
+            // fix angle again
 
-
-
-
-
+            // back into the board
         }
-
-
-
     }
 
     public void updateTargetTelemetry(AprilTagDetection target) {

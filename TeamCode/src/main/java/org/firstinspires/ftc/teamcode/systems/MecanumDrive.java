@@ -206,14 +206,16 @@ public class MecanumDrive {
             isTargetSet = false;
         }
 
+        double boost = (gyroTarget - imu.getYAngle()) / Constants.GYRO_BOOST_FACTOR;
+
         // I'm tired of figuring out the input problems so the inputs are still in flight stick mode
         // Meaning forward is reversed
         // The boost values should match the turn
-        // Since the drive is a diamond wheel pattern instead of an X, it reverses the strafe.
-        double leftFrontPower = -forward +strafe + turn;
-        double rightFrontPower = forward + strafe + turn;
-        double leftBackPower = -forward - strafe + turn;
-        double rightBackPower = forward - strafe + turn;
+        // Since the drive is a X instead of a diamond, it follows the more common style.
+        double leftFrontPower = -forward + strafe + turn + boost;
+        double rightFrontPower = forward + strafe + turn + boost;
+        double leftBackPower = -forward - strafe + turn + boost;
+        double rightBackPower = forward - strafe + turn + boost;
 
         double powerScale = Constants.MOTOR_MAX_SPEED * Math.max(1,
                 Math.max(
