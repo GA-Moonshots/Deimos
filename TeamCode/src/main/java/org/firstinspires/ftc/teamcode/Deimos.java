@@ -51,6 +51,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.sensors.Camera;
 import org.firstinspires.ftc.teamcode.systems.Elevator;
 import org.firstinspires.ftc.teamcode.systems.Launcher;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
@@ -68,7 +69,7 @@ public class Deimos extends LinearOpMode {
     // INSTANCE VARIABLES
     private double lastTime = 0.0d;
     private final ElapsedTime timer = new ElapsedTime();
-    private MecanumDrive.AprilTagToAlign align = MecanumDrive.AprilTagToAlign.NONE;
+    private Camera.AprilTagToAlign align = Camera.AprilTagToAlign.NONE;
     private Arm.RunState armState = Arm.RunState.NONE;
 
     // CONTROLLER TOGGLES TO AVOID DOUBLE PRESSING
@@ -160,18 +161,18 @@ public class Deimos extends LinearOpMode {
         boolean dpadLeftPressed = (gamepad1.dpad_left && !gamepad1.dpad_right);
         boolean dpadRightPressed = (gamepad1.dpad_right && !gamepad1.dpad_left);
         if(dpadLeftPressed && !(dpadUpPressed || dpadDownPressed || dpadRightPressed)) {
-            align = MecanumDrive.AprilTagToAlign.LEFT;
+            align = Camera.AprilTagToAlign.LEFT;
         } else if(dpadRightPressed && !(dpadUpPressed || dpadDownPressed || dpadLeftPressed)) {
-            align = MecanumDrive.AprilTagToAlign.RIGHT;
+            align = Camera.AprilTagToAlign.RIGHT;
         } else if(dpadUpPressed && !(dpadLeftPressed || dpadDownPressed || dpadRightPressed)) {
-            align = MecanumDrive.AprilTagToAlign.CENTER;
+            align = Camera.AprilTagToAlign.CENTER;
         } else if(dpadDownPressed && !(dpadUpPressed || dpadLeftPressed || dpadRightPressed)) {
-            align = MecanumDrive.AprilTagToAlign.NONE;
+            align = Camera.AprilTagToAlign.NONE;
         }
 
         // JOYSTICK: motion control - left stick strafes / right stick rotates
         // is the pilot denied control of the robot while we line up to an April tag?
-        if(align != MecanumDrive.AprilTagToAlign.NONE) {
+        if(align != Camera.AprilTagToAlign.NONE) {
             //if(!drive.alignToAprilTag(align)) {
              //   align = MecanumDrive.AprilTagToAlign.NONE;
             //}

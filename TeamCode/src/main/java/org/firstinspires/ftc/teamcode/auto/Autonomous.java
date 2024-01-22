@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.sensors.Camera;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 
@@ -17,7 +17,7 @@ public class Autonomous extends LinearOpMode {
     private MecanumDrive drive;
     private Arm arm;
 
-    private MecanumDrive.AprilTagToAlign align;
+    private Camera.AprilTagToAlign align;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -107,7 +107,7 @@ public class Autonomous extends LinearOpMode {
                 targetDistance = drive.leftDistance.doubleCheckDistance();
             else
                 targetDistance = drive.rightDistance.doubleCheckDistance();
-            if(align != MecanumDrive.AprilTagToAlign.LEFT) {
+            if(align != Camera.AprilTagToAlign.LEFT) {
                 // Store the current distance for the next piece
                 // Move left before going forward
                 if(isRed)
@@ -122,7 +122,7 @@ public class Autonomous extends LinearOpMode {
                 }
             }
             drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 5);
-            if(align != MecanumDrive.AprilTagToAlign.LEFT) {
+            if(align != Camera.AprilTagToAlign.LEFT) {
                 if(isRed)
                     drive.gotoLeftDistance(targetDistance);
                 else

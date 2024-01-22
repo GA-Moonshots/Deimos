@@ -50,6 +50,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Camera {
+    public enum AprilTagToAlign {
+        LEFT,
+        CENTER,
+        RIGHT,
+        NONE
+    }
+
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
@@ -77,6 +84,27 @@ public class Camera {
             gainControl.setGain(25);
         }
         return aprilTag.getDetections();
+    }
+
+    public AprilTagDetection isTagShowing(AprilTagToAlign tagPos) {
+        String targetName = tagPos.name().toLowerCase();
+
+        List<AprilTagDetection> detections = getDetections();
+
+        if(detections.size() == 0) {
+            return null;
+        }
+
+        AprilTagDetection activeDetection = null;
+
+        for(AprilTagDetection detection : detections) {
+            if(detection.metadata != null && detection.metadata.name.toLowerCase().contains(targetName)) {
+                activeDetection = detection;
+                break;
+            }
+        }
+
+        return activeDetection;
     }
 
     public String getStatus(){

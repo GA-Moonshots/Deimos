@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.auto.old;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Red - LEFT")
-public class RedLeftAuto extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Blue - RIGHT")
+public class BlueRightAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;
     private Arm arm;
@@ -31,41 +31,30 @@ public class RedLeftAuto extends LinearOpMode {
         waitForStart();
 
         // approach the prop
-        drive.gotoBackDistance(0.115, 24, 4);
+        drive.gotoBackDistance(0.13, 24, 4);
 
-        MecanumDrive.AprilTagToAlign align = drive.faceTheProp(0.3, 2);
-        stop();
+        drive.faceTheProp(0.3,2);
+        drive.stop();
         arm.open();
         sleep(100);
 
         // lift claw to get out of the way
         arm.travelMode();
 
-        if(align == MecanumDrive.AprilTagToAlign.CENTER) {
-            // Move left before going forward
-            drive.gotoLeftDistance(10);
-        } else {
-            // If we are facing left we are already facing the correct way
-            double turn = (align == MecanumDrive.AprilTagToAlign.LEFT) ? 0.0 : -0.4;
-            // Simply go straight ahead
-            drive.autonomouslyDriveByTime(-0.5, 0.0, 0.0, 1.25);
-            drive.autonomouslyDriveByTime(0.0, 0.5, turn, 3.5);
-        }
-        drive.gotoAngle(90);
-
-        // Raise the arm somewhere in here?
-
-        terminateOpModeNow();
         // This needs to be in field centric mode since it is going to go backwards regardless of what
         // position the robot goes to in the faceTheProp method to avoid running over the prop.
         drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 1.9);
 
+        // straighten out
+        drive.goToZeroAngle();
+
         // back to wall the rest of the way
         drive.gotoBackDistance(4);
-        drive.autonomouslyMove(0.2, 5, MecanumDrive.HowToMove.LEFT, 3);
+
+        drive.autonomouslyMove(0.2, 5, MecanumDrive.HowToMove.RIGHT, 3);
         drive.autonomouslyDriveByTime(-0.5 , 0.0, 0.0,2.5);
         drive.goToZeroAngle();
-        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.RIGHT, 5);
+        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.LEFT, 5);
         drive.autonomouslyDriveByTime(.2,0.0,0.0,1.0);
 
     }

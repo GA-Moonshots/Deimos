@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.auto.old;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Blue - LEFT")
-public class BlueLeftAuto extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Red - RIGHT")
+public class RedRightAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;
     private Arm arm;
@@ -20,7 +20,7 @@ public class BlueLeftAuto extends LinearOpMode {
     }
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new MecanumDrive(this);
         arm = new Arm(this);
@@ -31,7 +31,7 @@ public class BlueLeftAuto extends LinearOpMode {
         waitForStart();
 
         // approach the prop
-        drive.gotoBackDistance(0.125, 24, 4);
+        drive.gotoBackDistance(0.11, 24, 4);
 
         drive.faceTheProp(0.3);
         stop();
@@ -48,10 +48,10 @@ public class BlueLeftAuto extends LinearOpMode {
         // straighten out
         drive.goToZeroAngle();
 
-        // back to wall the rest of the way
+        // back up to the wall the rest of the way
         drive.gotoBackDistance(4);
 
-        // park for five points
-        drive.gotoLeftDistance(5, 5.5);
+        // park for 5 points
+        drive.autonomouslyMove(0.3, 5, MecanumDrive.HowToMove.RIGHT, 4.75);
     }
 }

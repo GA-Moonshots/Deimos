@@ -83,18 +83,10 @@ import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.sensors.IMU;
 import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
 import org.firstinspires.ftc.teamcode.sensors.Camera;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import java.util.List;
 
 public class MecanumDrive {
     // USEFUL ENUMS
-    public enum AprilTagToAlign {
-        LEFT,
-        CENTER,
-        RIGHT,
-        NONE
-    }
+
 
     public enum HowToMove {
         LEFT,
@@ -119,7 +111,7 @@ public class MecanumDrive {
     public Telemetry telemetry;
 
     // INSTANCE VARIABLES
-    private LinearOpMode opMode;
+    private final LinearOpMode opMode;
     private double gyroTarget = 0.0d;
     private double runawayRobotShield = -1;
     private double lastAprilTagYaw = 0.0d;
@@ -140,10 +132,10 @@ public class MecanumDrive {
         rightFront = opMode.hardwareMap.get(DcMotor.class, Constants.RIGHT_FRONT_NAME);
         leftBack = opMode.hardwareMap.get(DcMotor.class, Constants.LEFT_BACK_NAME);
         rightBack = opMode.hardwareMap.get(DcMotor.class, Constants.RIGHT_BACK_NAME);
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         rearDistance = new DistanceSensor(opMode, Constants.REAR_DIST_NAME);
         rightDistance = new DistanceSensor(opMode, Constants.RIGHT_DIST_NAME);
@@ -476,11 +468,11 @@ public class MecanumDrive {
     // ---- THIS YEAR'S GAME ----
     // ---- THIS YEAR'S GAME ----
 
-    public AprilTagToAlign faceTheProp(double str) {
+    public Camera.AprilTagToAlign faceTheProp(double str) {
         return faceTheProp(str, 1.5);
     }
 
-    public AprilTagToAlign faceTheProp(double str, double maxTime) {
+    public Camera.AprilTagToAlign faceTheProp(double str, double maxTime) {
         boolean isLeft = false;
         boolean isRight = false;
 
@@ -500,14 +492,14 @@ public class MecanumDrive {
         if(isLeft) {
             autonomouslyMove(str, 90, HowToMove.ROTATE_LEFT, 5);
             autonomouslyDriveByTime(0.0, -0.1, 0.0, 0.2);
-            return AprilTagToAlign.LEFT;
+            return Camera.AprilTagToAlign.LEFT;
         } else if(isRight) {
             autonomouslyMove(str, -90, HowToMove.ROTATE_RIGHT, 5);
             autonomouslyDriveByTime(0.0, 0.1, 0.0, 0.2);
-            return AprilTagToAlign.RIGHT;
+            return Camera.AprilTagToAlign.RIGHT;
         } else {
             autonomouslyDriveByTime(0.15, 0.0, 0.0, 1);
-            return AprilTagToAlign.CENTER;
+            return Camera.AprilTagToAlign.CENTER;
         }
     }
 
@@ -542,50 +534,8 @@ public class MecanumDrive {
         autonomouslyMove(str, targetAngle, newMovement, maxTime);
     }
 
-    public void alignToAprilTag(double str, AprilTagToAlign alignment) {
-        // Get detections
-        List<AprilTagDetection> detections = camera.getDetections();
+    public void alignToAprilTag(double str, Camera.AprilTagToAlign alignment) {
 
-        // Check if list is empty
-        if(detections.size() == 0) {
-            telemetry.addData("Detections", "None Found");
-            telemetry.update();
-            return;
-        }
-        String nameToFind = "";
-
-        switch(alignment) {
-            case CENTER:
-                nameToFind = "center";
-                break;
-            case RIGHT:
-                nameToFind = "right";
-                break;
-            case LEFT:
-                nameToFind = "left";
-        }
-
-        AprilTagDetection correctTag = null;
-        for(AprilTagDetection detection :detections) {
-            if(detection.metadata.name.toLowerCase().contains(nameToFind)) {
-                correctTag = detection;
-                break;
-            }
-        }
-
-        // If correctTag is null, attempt to move in the correct direction to find it
-        if(correctTag == null) {
-            return;
-        }
-
-        // Correct tag now holds a tag we can align to
-        if(Math.abs(correctTag.ftcPose.x) > Constants.DISTANCE_THRESHOLD) {
-            // Since we should be rotated 90 by now,
-            // we can assume we're moving with the forward value
-            // The x values align with the flight stick forward value, so nothing
-            // else is needed here to ensure the distance is correct
-            drive(str * Constants.KP * (correctTag.ftcPose.x), 0.0, 0.0);
-        }
     }
 
 }
