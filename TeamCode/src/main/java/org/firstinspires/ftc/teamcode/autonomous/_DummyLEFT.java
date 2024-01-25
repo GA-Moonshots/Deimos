@@ -27,11 +27,13 @@
 
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 
+@Disabled
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = ".Dummy LEFT")
 public class _DummyLEFT extends LinearOpMode {
     @Override

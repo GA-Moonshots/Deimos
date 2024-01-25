@@ -1,12 +1,16 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import androidx.appcompat.app.ActionBar;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
+@Disabled
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Blue - LEFT")
 public class BlueLeftAuto extends LinearOpMode {
     // SUBSYSTEMS
