@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.checkerframework.checker.units.qual.A;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.sensors.Camera;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
@@ -29,16 +30,20 @@ public class AprilTagAuto extends LinearOpMode {
         drive = new MecanumDrive(this);
         arm = new Arm(this);
 
-
         AprilTagDetection target = null;
+
+        while(opModeInInit()) {
+            telemetry.addData("Camera:", drive.camera.getStatus());
+            telemetry.update();
+        }
 
         // we are right in front of the board for testing
         waitForStart();
 
-        while(opModeIsActive()){
+        drive.makeRobotCentric();
+        while(opModeIsActive()) {
 
             // fix angle
-
             target = fetchTarget();
 
 
@@ -47,15 +52,17 @@ public class AprilTagAuto extends LinearOpMode {
                 updateTargetTelemetry(target);
 
                 // fix our delta x value for alignment
-                while(opModeIsActive() && Math.abs(target.ftcPose.x) > 1){
-                    drive.makeRobotCentric();
-                    drive.drive(0.0,-target.ftcPose.x / 10,0.0);
+                if(Math.abs(target.ftcPose.x) > Constants.DISTANCE_THRESHOLD) {
+                    drive.autonomouslyDriveByTime(0.0, -target.ftcPose.x / 40, 0.0, 1);
+                    drive.goToZeroAngle();
                 }
+                drive.autonomouslyDriveByTime(0.3,0,0,1);
                 drive.stop();
 
             }
             else{
-                System.out.println("lmao sorry");
+                telemetry.addData("Nop", "lmao sorry");
+                telemetry.update();
             }
 
             // fix angle again

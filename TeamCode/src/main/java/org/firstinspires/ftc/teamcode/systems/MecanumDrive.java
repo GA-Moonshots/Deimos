@@ -273,10 +273,8 @@ public class MecanumDrive {
     }
 
     public void autonomouslyDriveByTime(double forward, double strafe, double turn, double time) {
-        ElapsedTime rt = new ElapsedTime();
-        while(opMode.opModeIsActive() && rt.seconds() <= time) {
-            drive(forward, strafe, turn);
-        }
+        drive(forward, strafe, turn);
+        opMode.sleep((long) time * 1000);
         stop();
     }
 
