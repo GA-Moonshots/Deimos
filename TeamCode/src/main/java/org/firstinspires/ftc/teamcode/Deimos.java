@@ -179,7 +179,7 @@ public class Deimos extends LinearOpMode {
         // listen to driver controls
         } else {
             telemetry.addData("Drive", "Listening to LSX, LSY, RSX");
-            double speedMod = gamepad1.right_bumper ? 0.5 : 1; // slow mode
+            double speedMod = gamepad1.left_stick_button ? 0.2 : 1; // slow mode
             double forward = gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double turn = gamepad1.right_stick_x;

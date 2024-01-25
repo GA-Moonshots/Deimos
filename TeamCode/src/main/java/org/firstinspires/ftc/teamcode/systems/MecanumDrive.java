@@ -132,10 +132,10 @@ public class MecanumDrive {
         rightFront = opMode.hardwareMap.get(DcMotor.class, Constants.RIGHT_FRONT_NAME);
         leftBack = opMode.hardwareMap.get(DcMotor.class, Constants.LEFT_BACK_NAME);
         rightBack = opMode.hardwareMap.get(DcMotor.class, Constants.RIGHT_BACK_NAME);
-        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rearDistance = new DistanceSensor(opMode, Constants.REAR_DIST_NAME);
         rightDistance = new DistanceSensor(opMode, Constants.RIGHT_DIST_NAME);
