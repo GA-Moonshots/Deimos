@@ -26,7 +26,7 @@ public class Autonomous extends LinearOpMode {
 
         while(opModeInInit()) {
             // Set side of field (left/right, red/blue)
-            //Do we start in fieldcentric? if not then why?
+            //Do we start in field centric? if not then why?
             if (gamepad1.dpad_left)
                 isLeft = true;
             else if (gamepad1.dpad_right)

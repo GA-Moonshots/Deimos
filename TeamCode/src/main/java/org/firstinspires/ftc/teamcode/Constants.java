@@ -7,13 +7,13 @@ public class Constants {
     public static final int ARM_DOWN_POSITION = 0;
     public static final double ARM_MOTOR_STRENGTH = 0.9;
     public static final double WRIST_ON_WALL =  0.6;
-    public static final double CLAW_OPEN_POS = 0.5;
-    public static final double CLAW_CLOSED_POS = 0.9;
+    public static final double CLAW_OPEN_POS = 0.0;
+    public static final double CLAW_CLOSED_POS = 1;
     public static final double WRIST_INC = 0.01;
-    public static final double WRIST_MAX = 0.8;
-    public static final double WRIST_ON_GROUND = 0.36;
+    public static final double WRIST_MAX = 1;
+    public static final double WRIST_ON_GROUND = 0;
     public static final double WRIST_MIN = 0.0;
-    public static final double ROLL_MAX = 0.72;
+    public static final double ROLL_MAX = 1;
     public static final double ROLL_MIN = 0;
     public static final double ROLL_INC = 0.03;
 
@@ -58,7 +58,8 @@ public class Constants {
     public static final String ELEVATOR_MOTOR_NAME = "elevator";
     // --------- SERVO NAMES ---------
     public static final String WRIST_SERVO_NAME = "wrist";
-    public static final String OPEN_SERVO_NAME = "open";
+    public static final String LEFT_OPEN_SERVO_NAME = "left_open";
+    public static final String RIGHT_OPEN_SERVO_NAME = "right_open";
     public static final String ROLL_SERVO_NAME = "roll";
     public static final String LAUNCHER_SERVO_NAME = "launcher";
     public static final String ELEVATOR_LEFT_SERVO_NAME = "elevLeft";

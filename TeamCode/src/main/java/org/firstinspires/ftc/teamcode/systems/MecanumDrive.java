@@ -78,6 +78,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.sensors.IMU;
@@ -197,15 +198,17 @@ public class MecanumDrive {
         } else if(telemetry != null)
             telemetry.addData("Mode", "Robot Centric");
 
-        isGyroLocked = turn <= Constants.INPUT_THRESHOLD;
+        isGyroLocked = turn <= Constants.INPUT_THRESHOLD && Math.hypot(forward, strafe) <= Constants.INPUT_THRESHOLD;
         double boost = 0;
         if(isGyroLocked && !isTargetSet) {
             gyroTarget = imu.getYAngle();
             isTargetSet = true;
-            boost = (gyroTarget - imu.getYAngle()) / Constants.GYRO_BOOST_FACTOR;
         } else if(!isGyroLocked) {
             isTargetSet = false;
         }
+
+        if(isTargetSet && isGyroLocked)
+            boost = (gyroTarget - imu.getYAngle()) / Constants.GYRO_BOOST_FACTOR;
 
         // forward is reversed (flight stick) and boost values should match the turn
         // the mecanum drive is a X instead of a diamond
@@ -215,7 +218,7 @@ public class MecanumDrive {
         double rightBackPower = forward - strafe + turn + boost;
 
         // if an input exceeds max, everything is proportionally reduced to keep balanced
-        double powerScale = Constants.MOTOR_MAX_SPEED * Math.max(1,
+        double powerScale = Math.max(1,
                 Math.max(
                         Math.max(
                                 Math.abs(leftFrontPower),
@@ -232,6 +235,11 @@ public class MecanumDrive {
         leftBackPower /= powerScale;
         rightBackPower /= powerScale;
         rightFrontPower /= powerScale;
+
+        leftFrontPower *= Constants.MOTOR_MAX_SPEED;
+        leftBackPower *= Constants.MOTOR_MAX_SPEED;
+        rightBackPower *= Constants.MOTOR_MAX_SPEED;
+        rightFrontPower *= Constants.MOTOR_MAX_SPEED;
 
         if(telemetry != null)
             telemetry.addData("Motors", "(%.2f, %.2f, %.2f, %.2f)",

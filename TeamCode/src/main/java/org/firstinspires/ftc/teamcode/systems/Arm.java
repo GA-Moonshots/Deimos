@@ -79,7 +79,8 @@ import java.util.Locale;
 public class Arm {
     // SUBSYSTEM ASSETS
     private final Servo wristServo;
-    private final Servo openServo;
+    private final Servo leftOpenServo;
+    private final Servo rightOpenServo;
     private final Servo rollServo;
     private final DcMotor motor;
     private LinearOpMode opMode;
@@ -96,17 +97,19 @@ public class Arm {
         NONE
     }
 
-
     public Arm(LinearOpMode opMode) {
         this.opMode = opMode;
         this.motor = opMode.hardwareMap.get(DcMotor.class, Constants.ARM_MOTOR_NAME);
         this.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.motor.setDirection(DcMotorSimple.Direction.REVERSE);
         wristServo = opMode.hardwareMap.get(Servo.class, Constants.WRIST_SERVO_NAME);
-        openServo = opMode.hardwareMap.get(Servo.class, Constants.OPEN_SERVO_NAME);
+        leftOpenServo = opMode.hardwareMap.get(Servo.class, Constants.LEFT_OPEN_SERVO_NAME);
+        leftOpenServo.setDirection(Servo.Direction.REVERSE);
+        rightOpenServo = opMode.hardwareMap.get(Servo.class, Constants.RIGHT_OPEN_SERVO_NAME);
         rollServo = opMode.hardwareMap.get(Servo.class, Constants.ROLL_SERVO_NAME);
         wristServo.setPosition(wristAng);
-        openServo.setPosition(Constants.CLAW_CLOSED_POS);
+        leftOpenServo.setPosition(Constants.CLAW_CLOSED_POS);
+        rightOpenServo.setPosition(Constants.CLAW_CLOSED_POS);
         rollServo.setPosition(rollPos);
     }
 
@@ -124,7 +127,9 @@ public class Arm {
         else
             motor.setPower(0);
     }
-
+    public void changeOffset(int delta) {
+        offset += delta;
+    }
     public boolean goToPickUp() {
         // ongoing motion check... should it continue moving?
         if(motor.getCurrentPosition() + offset <= Constants.ARM_DOWN_POSITION)
@@ -142,7 +147,6 @@ public class Arm {
         open();
         return false;
     }
-
     public boolean goToDropOff() {
         close();
         if(motor.getCurrentPosition() + offset >= Constants.ARM_UP_POSITION) {
@@ -157,7 +161,6 @@ public class Arm {
         }
         return false;
     }
-
     public void travelMode() {
         close();
         wristServo.setPosition(0);
@@ -171,43 +174,32 @@ public class Arm {
         }
         wristServo.setPosition(wristAng);
     }
-
+    public void wristDown() {
+        wristAng += Constants.WRIST_INC;
+        wristAng = Range.clip(wristAng, Constants.WRIST_MIN, Constants.WRIST_MAX);
+        wristServo.setPosition(wristAng);
+    }
     public void wristTo(double wristToMove) {
         wristToMove = Range.clip(wristToMove, Constants.WRIST_MIN, Constants.WRIST_MAX);
         wristServo.setPosition(wristToMove);
         wristAng = wristToMove;
     }
 
-    public void wristDown() {
-        wristAng += Constants.WRIST_INC;
-        wristAng = Range.clip(wristAng, Constants.WRIST_MIN, Constants.WRIST_MAX);
-        wristServo.setPosition(wristAng);
-    }
-
     public void open() {
-        openServo.setPosition(Constants.CLAW_OPEN_POS);
+        leftOpenServo.setPosition(Constants.CLAW_OPEN_POS);
+        rightOpenServo.setPosition(Constants.CLAW_OPEN_POS);
         isOpen = true;
     }
     public void close() {
-        openServo.setPosition(Constants.CLAW_CLOSED_POS);
+        leftOpenServo.setPosition(Constants.CLAW_CLOSED_POS);
+        rightOpenServo.setPosition(Constants.CLAW_CLOSED_POS);
         isOpen = false;
     }
-
     public void toggleOpen() {
         if(isOpen) {
             close();
         } else {
             open();
-        }
-    }
-
-    public void toggleRoll() {
-        if(rollServo.getPosition() >= .5){
-            rollServo.setPosition(Constants.ROLL_MIN);
-            rollPos = Constants.ROLL_MIN;
-        } else{
-            rollServo.setPosition(Constants.ROLL_MAX);
-            rollPos = Constants.ROLL_MAX;
         }
     }
 
@@ -218,7 +210,6 @@ public class Arm {
 
         rollServo.setPosition(rollPos);
     }
-
     public void rollNegative() {
         rollPos -=  Constants.ROLL_INC;
         if(rollPos < Constants.ROLL_MIN)
@@ -226,14 +217,20 @@ public class Arm {
 
         rollServo.setPosition(rollPos);
     }
+    public void toggleRoll() {
+        if(rollServo.getPosition() >= .5){
+            rollServo.setPosition(Constants.ROLL_MIN);
+            rollPos = Constants.ROLL_MIN;
+        } else{
+            rollServo.setPosition(Constants.ROLL_MAX);
+            rollPos = Constants.ROLL_MAX;
+        }
+    }
 
     @NonNull
     @Override
     public String toString() {
-        return String.format(Locale.ENGLISH, "OPR: (%f, %f, %f)", openServo.getPosition(), wristServo.getPosition(), rollServo.getPosition());
+        return String.format(Locale.US, "LRPR: (%f, %f, %f, %f)", leftOpenServo.getPosition(), rightOpenServo.getPosition(), wristServo.getPosition(), rollServo.getPosition());
     }
 
-    public void changeOffset(int delta) {
-        offset += delta;
-    }
 }
