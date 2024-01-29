@@ -109,7 +109,7 @@ public class Deimos extends LinearOpMode {
         while(opModeIsActive()) {
             telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
-            telemetry.addData("UPS", 1 / (timer.seconds() - lastTime));
+            // telemetry.addData("UPS", 1 / (timer.seconds() - lastTime));
             telemetry.addData("Camera:", drive.camera.getStatus());
             lastTime = timer.seconds();
 
@@ -155,6 +155,7 @@ public class Deimos extends LinearOpMode {
         if (Math.abs(turn) <= Constants.INPUT_THRESHOLD) turn = 0.0d;
 
         drive.drive(forward * speedMod, strafe * speedMod, turn * speedMod);
+
 
     }
 
