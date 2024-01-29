@@ -75,12 +75,10 @@ public class Deimos extends LinearOpMode {
     // CONTROLLER TOGGLES TO AVOID DOUBLE PRESSING
     private boolean gp1aPressed = false;
     private boolean gp1bPressed = false;
-    private boolean gp2aPressed = false;
     private boolean gp2bPressed = false;
     private boolean gp2xPressed = false;
     private boolean gp2yPressed = false;
     private boolean gp2rbPressed = false;
-    private boolean gp2lbPressed = false;
     private boolean gp2rtPressed = false;
     
     @Override
@@ -137,60 +135,26 @@ public class Deimos extends LinearOpMode {
         }
         gp1aPressed = gamepad1.a; // this structure avoids double press
 
-        // B BUTTON: available
-        if (gamepad1.b && !gp1bPressed && !gamepad2.start) {
-        }
-        gp1bPressed = gamepad1.b; // this structure avoids double press
-
-        // X BUTTON: available
-
         // Y BUTTON : Reset Field Centric Target
         if(gamepad1.y){
             drive.resetFieldCentricTarget();
         }
 
-
         if(gamepad1.right_trigger >= Constants.INPUT_THRESHOLD){
             launcher.release();
-
         }
 
-        // DPAD: align to April Tag
-        boolean dpadUpPressed = (gamepad1.dpad_up && !gamepad1.dpad_down);
-        boolean dpadDownPressed = (gamepad1.dpad_down && !gamepad1.dpad_up);
-        boolean dpadLeftPressed = (gamepad1.dpad_left && !gamepad1.dpad_right);
-        boolean dpadRightPressed = (gamepad1.dpad_right && !gamepad1.dpad_left);
-        if(dpadLeftPressed && !(dpadUpPressed || dpadDownPressed || dpadRightPressed)) {
-            align = Camera.AprilTagToAlign.LEFT;
-        } else if(dpadRightPressed && !(dpadUpPressed || dpadDownPressed || dpadLeftPressed)) {
-            align = Camera.AprilTagToAlign.RIGHT;
-        } else if(dpadUpPressed && !(dpadLeftPressed || dpadDownPressed || dpadRightPressed)) {
-            align = Camera.AprilTagToAlign.CENTER;
-        } else if(dpadDownPressed && !(dpadUpPressed || dpadLeftPressed || dpadRightPressed)) {
-            align = Camera.AprilTagToAlign.NONE;
-        }
+        double speedMod = gamepad1.left_stick_button ? 0.2 : 1; // slow mode
+        double forward = gamepad1.left_stick_y;
+        double strafe = gamepad1.left_stick_x;
+        double turn = gamepad1.right_stick_x;
 
-        // JOYSTICK: motion control - left stick strafes / right stick rotates
-        // is the pilot denied control of the robot while we line up to an April tag?
-        if(align != Camera.AprilTagToAlign.NONE) {
-            //if(!drive.alignToAprilTag(align)) {
-             //   align = MecanumDrive.AprilTagToAlign.NONE;
-            //}
-        // listen to driver controls
-        } else {
-            telemetry.addData("Drive", "Listening to LSX, LSY, RSX");
-            double speedMod = gamepad1.left_stick_button ? 0.2 : 1; // slow mode
-            double forward = gamepad1.left_stick_y;
-            double strafe = gamepad1.left_stick_x;
-            double turn = gamepad1.right_stick_x;
+        // DEAD-ZONES
+        if (Math.abs(forward) <= Constants.INPUT_THRESHOLD) forward = 0.0d;
+        if (Math.abs(strafe) <= Constants.INPUT_THRESHOLD)  strafe = 0.0d;
+        if (Math.abs(turn) <= Constants.INPUT_THRESHOLD) turn = 0.0d;
 
-            // DEAD-ZONES
-            if (Math.abs(forward) <= Constants.INPUT_THRESHOLD) forward = 0.0d;
-            if (Math.abs(strafe) <= Constants.INPUT_THRESHOLD)  strafe = 0.0d;
-            if (Math.abs(turn) <= Constants.INPUT_THRESHOLD) turn = 0.0d;
-
-            drive.drive(forward * speedMod, strafe * speedMod, turn * speedMod);
-        }
+        drive.drive(forward * speedMod, strafe * speedMod, turn * speedMod);
 
     }
 
@@ -225,6 +189,7 @@ public class Deimos extends LinearOpMode {
             armState = Arm.RunState.NONE;
         gp2yPressed = gamepad2.y;
 
+        // TRIGGER
         if(gamepad2.right_trigger >= Constants.INPUT_THRESHOLD && !gp2rtPressed && armState != Arm.RunState.GOTO_DROPOFF) {
             armState = Arm.RunState.GOTO_LOW;
         } else if(gamepad2.right_trigger >= Constants.INPUT_THRESHOLD && !gp2rtPressed) {
@@ -242,10 +207,10 @@ public class Deimos extends LinearOpMode {
                 armState = Arm.RunState.NONE;
             return;
         } else if(armState == Arm.RunState.GOTO_LOW) {
-            //arm.
+            // TODO: implement condition or remove
         }
 
-
+        // RIGHT BUMPER ELEVATOR
         if(gamepad2.right_bumper && !gp2rbPressed) {
             elevator.toggleLock();
         }

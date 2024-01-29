@@ -187,8 +187,7 @@ public class MecanumDrive {
 
         // Field Centric adjustment
         if (isFieldCentric) {
-            // Learn more:
-            // https://www.geogebra.org/m/fmegkksm
+            // Learn more: https://www.geogebra.org/m/fmegkksm
             double diff = fieldCentricTarget - imu.getZAngle();
             double temp = forward;
             forward = forward * Math.cos(Math.toRadians(diff)) - strafe * Math.sin(Math.toRadians(diff));
@@ -206,17 +205,17 @@ public class MecanumDrive {
             isTargetSet = false;
         }
 
+        // TODO: TUNE THE GYRO-LOCK
         double boost = (gyroTarget - imu.getYAngle()) / Constants.GYRO_BOOST_FACTOR;
 
-        // I'm tired of figuring out the input problems so the inputs are still in flight stick mode
-        // Meaning forward is reversed
-        // The boost values should match the turn
-        // Since the drive is a X instead of a diamond, it follows the more common style.
+        // forward is reversed (flight stick) and boost values should match the turn
+        // the mecanum drive is a X instead of a diamond
         double leftFrontPower = -forward + strafe + turn + boost;
         double rightFrontPower = forward + strafe + turn + boost;
         double leftBackPower = -forward - strafe + turn + boost;
         double rightBackPower = forward - strafe + turn + boost;
 
+        // if an input exceeds max, everything is proportionally reduced to keep balanced
         double powerScale = Constants.MOTOR_MAX_SPEED * Math.max(1,
                 Math.max(
                         Math.max(
@@ -234,7 +233,6 @@ public class MecanumDrive {
         leftBackPower /= powerScale;
         rightBackPower /= powerScale;
         rightFrontPower /= powerScale;
-
 
         if(telemetry != null)
             telemetry.addData("Motors", "(%.2f, %.2f, %.2f, %.2f)",
