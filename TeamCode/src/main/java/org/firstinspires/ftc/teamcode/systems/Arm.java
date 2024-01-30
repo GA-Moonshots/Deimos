@@ -68,11 +68,13 @@ import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.auto.Autonomous;
 
 import java.util.Locale;
 
@@ -82,7 +84,7 @@ public class Arm {
     private final Servo leftOpenServo;
     private final Servo rightOpenServo;
     private final Servo rollServo;
-    private final DcMotor motor;
+    private final DcMotorEx motor;
     private LinearOpMode opMode;
 
     // STATE VARIABLES
@@ -99,18 +101,28 @@ public class Arm {
 
     public Arm(LinearOpMode opMode) {
         this.opMode = opMode;
-        this.motor = opMode.hardwareMap.get(DcMotor.class, Constants.ARM_MOTOR_NAME);
+        this.motor = opMode.hardwareMap.get(DcMotorEx.class, Constants.ARM_MOTOR_NAME);
         this.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         wristServo = opMode.hardwareMap.get(Servo.class, Constants.WRIST_SERVO_NAME);
         leftOpenServo = opMode.hardwareMap.get(Servo.class, Constants.LEFT_OPEN_SERVO_NAME);
         leftOpenServo.setDirection(Servo.Direction.REVERSE);
         rightOpenServo = opMode.hardwareMap.get(Servo.class, Constants.RIGHT_OPEN_SERVO_NAME);
         rollServo = opMode.hardwareMap.get(Servo.class, Constants.ROLL_SERVO_NAME);
-        wristServo.setPosition(wristAng);
-        leftOpenServo.setPosition(Constants.CLAW_CLOSED_POS);
-        rightOpenServo.setPosition(Constants.CLAW_CLOSED_POS);
-        rollServo.setPosition(rollPos);
+
+
+        if(opMode instanceof Autonomous) {
+            wristServo.setPosition(wristAng);
+            leftOpenServo.setPosition(Constants.LEFT_CLAW_CLOSED_POS);
+            rightOpenServo.setPosition(Constants.RIGHT_CLAW_CLOSED_POS);
+            rollServo.setPosition(rollPos);
+        }
+        else{
+            rollPos = Constants.ROLL_MIN;
+            wristAng = Constants.WRIST_ON_GROUND;
+
+        }
     }
 
     public void move(double shoulderRot){
@@ -123,7 +135,7 @@ public class Arm {
 
         if((shoulderRot < 0 && motor.getCurrentPosition() + offset >= Constants.ARM_UP_POSITION) ||
                 (shoulderRot > 0 && motor.getCurrentPosition() + offset <= Constants.ARM_DOWN_POSITION))
-            motor.setPower(shoulderRot * Constants.ARM_MOTOR_STRENGTH);
+            motor.setPower(shoulderRot * Constants.ARM_MOTOR_STRENGTH_UP);
         else
             motor.setPower(0);
     }
@@ -131,16 +143,18 @@ public class Arm {
         offset += delta;
     }
     public boolean goToPickUp() {
+        // Make these internal state loops?
+
         // ongoing motion check... should it continue moving?
         if(motor.getCurrentPosition() + offset <= Constants.ARM_DOWN_POSITION)
-            motor.setPower(Constants.ARM_MOTOR_STRENGTH);
+            motor.setPower(Constants.ARM_MOTOR_STRENGTH_DOWN);
         else return true;
         // Encoder values go down as arm goes up
         // -1400 + x >= -400
         // offset corrects encoder "walk"
-        if(motor.getCurrentPosition() + offset >= -1350){
-            rollServo.setPosition(Constants.ROLL_MAX);
-            rollPos = Constants.ROLL_MAX;
+        if(motor.getCurrentPosition() + offset >= -750){
+            rollServo.setPosition(Constants.ROLL_MIN);
+            rollPos = Constants.ROLL_MIN;
             wristServo.setPosition(Constants.WRIST_ON_GROUND);
             wristAng = Constants.WRIST_ON_GROUND;
         }
@@ -150,12 +164,12 @@ public class Arm {
     public boolean goToDropOff() {
         close();
         if(motor.getCurrentPosition() + offset >= Constants.ARM_UP_POSITION) {
-            motor.setPower(-Constants.ARM_MOTOR_STRENGTH);
+            motor.setPower(-Constants.ARM_MOTOR_STRENGTH_UP);
         } else return true;
         // Encoder values go down as arm goes up
         if(motor.getCurrentPosition() + offset <= -400){
-            rollServo.setPosition(Constants.ROLL_MIN);
-            rollPos = Constants.ROLL_MIN;
+            rollServo.setPosition(Constants.ROLL_MAX);
+            rollPos = Constants.ROLL_MAX;
             wristServo.setPosition(Constants.WRIST_ON_WALL);
             wristAng = Constants.WRIST_ON_WALL;
         }
@@ -186,13 +200,13 @@ public class Arm {
     }
 
     public void open() {
-        leftOpenServo.setPosition(Constants.CLAW_OPEN_POS);
-        rightOpenServo.setPosition(Constants.CLAW_OPEN_POS);
+        leftOpenServo.setPosition(Constants.LEFT_CLAW_OPEN_POS);
+        rightOpenServo.setPosition(Constants.RIGHT_CLAW_OPEN_POS);
         isOpen = true;
     }
     public void close() {
-        leftOpenServo.setPosition(Constants.CLAW_CLOSED_POS);
-        rightOpenServo.setPosition(Constants.CLAW_CLOSED_POS);
+        leftOpenServo.setPosition(Constants.LEFT_CLAW_CLOSED_POS);
+        rightOpenServo.setPosition(Constants.RIGHT_CLAW_CLOSED_POS);
         isOpen = false;
     }
     public void toggleOpen() {

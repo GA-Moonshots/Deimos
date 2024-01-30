@@ -110,7 +110,8 @@ public class Deimos extends LinearOpMode {
             telemetry.addData("G1LS", "(%f, %f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
             telemetry.addData("G1RS", "(%f, %f)", gamepad1.right_stick_x, gamepad1.right_stick_y);
             // telemetry.addData("UPS", 1 / (timer.seconds() - lastTime));
-            telemetry.addData("Camera:", drive.camera.getStatus());
+            telemetry.addData("Camera", drive.camera.getStatus());
+            telemetry.addData("Arm", arm);
             lastTime = timer.seconds();
 
             // Driver 1: Responsible for drivetrain and movement

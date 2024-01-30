@@ -52,6 +52,7 @@ public class Autonomous extends LinearOpMode {
         //force field centric
         drive.makeFieldCentric();
         arm.wristTo(Constants.WRIST_ON_GROUND);
+        arm.toggleRoll();
         // approach the prop
         drive.gotoBackDistance(0.115, 24, 4);
 
@@ -77,6 +78,7 @@ public class Autonomous extends LinearOpMode {
         } else {
             parkOutside();
         }
+        //
     }
 
     public void near() {

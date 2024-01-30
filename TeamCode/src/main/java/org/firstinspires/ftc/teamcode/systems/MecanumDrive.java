@@ -75,6 +75,7 @@ import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -98,10 +99,10 @@ public class MecanumDrive {
     }
 
     // MOTORS
-    private final DcMotor leftFront;
-    private final DcMotor rightFront;
-    private final DcMotor leftBack;
-    private final DcMotor rightBack;
+    private final DcMotorEx leftFront;
+    private final DcMotorEx rightFront;
+    private final DcMotorEx leftBack;
+    private final DcMotorEx rightBack;
 
     // SENSORS
     public DistanceSensor rearDistance;
@@ -129,14 +130,20 @@ public class MecanumDrive {
         this.camera = new Camera(opMode.hardwareMap, opMode.telemetry);
         this.opMode = opMode;
 
-        leftFront = opMode.hardwareMap.get(DcMotor.class, Constants.LEFT_FRONT_NAME);
-        rightFront = opMode.hardwareMap.get(DcMotor.class, Constants.RIGHT_FRONT_NAME);
-        leftBack = opMode.hardwareMap.get(DcMotor.class, Constants.LEFT_BACK_NAME);
-        rightBack = opMode.hardwareMap.get(DcMotor.class, Constants.RIGHT_BACK_NAME);
+        leftFront = opMode.hardwareMap.get(DcMotorEx.class, Constants.LEFT_FRONT_NAME);
+        rightFront = opMode.hardwareMap.get(DcMotorEx.class, Constants.RIGHT_FRONT_NAME);
+        leftBack = opMode.hardwareMap.get(DcMotorEx.class, Constants.LEFT_BACK_NAME);
+        rightBack = opMode.hardwareMap.get(DcMotorEx.class, Constants.RIGHT_BACK_NAME);
+
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rearDistance = new DistanceSensor(opMode, Constants.REAR_DIST_NAME);
         rightDistance = new DistanceSensor(opMode, Constants.RIGHT_DIST_NAME);
@@ -209,8 +216,8 @@ public class MecanumDrive {
             isTargetSet = false;
         }
 
-        if(isTargetSet && isGyroLocked)
-            boost = (gyroTarget - imu.getYAngle()) / Constants.GYRO_BOOST_FACTOR;
+        //if(isTargetSet && isGyroLocked)
+            //boost = -(gyroTarget - imu.getYAngle()) / Constants.GYRO_BOOST_FACTOR;
 
         // forward is reversed (flight stick) and boost values should match the turn
         // the mecanum drive is a X instead of a diamond

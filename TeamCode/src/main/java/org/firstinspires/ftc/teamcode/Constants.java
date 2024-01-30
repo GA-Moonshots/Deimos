@@ -5,16 +5,19 @@ public class Constants {
     // ----ARM VARIABLES----
     public static final int ARM_UP_POSITION = -1000;
     public static final int ARM_DOWN_POSITION = 0;
-    public static final double ARM_MOTOR_STRENGTH = 0.9;
-    public static final double WRIST_ON_WALL =  0.6;
-    public static final double CLAW_OPEN_POS = 0.0;
-    public static final double CLAW_CLOSED_POS = 1;
+    public static final double ARM_MOTOR_STRENGTH_UP = 0.9;
+    public static final double ARM_MOTOR_STRENGTH_DOWN = 0.5;
+    public static final double WRIST_ON_WALL =  0.7;
+    public static final double LEFT_CLAW_OPEN_POS = 0.5;
+    public static final double LEFT_CLAW_CLOSED_POS = 0.7;
+    public static final double RIGHT_CLAW_OPEN_POS = 0.0;
+    public static final double RIGHT_CLAW_CLOSED_POS = 0.5;
     public static final double WRIST_INC = 0.01;
     public static final double WRIST_MAX = 1;
-    public static final double WRIST_ON_GROUND = 0;
-    public static final double WRIST_MIN = 0.0;
-    public static final double ROLL_MAX = 1;
-    public static final double ROLL_MIN = 0;
+    public static final double WRIST_ON_GROUND = 0.44;
+    public static final double WRIST_MIN = 0.15;
+    public static final double ROLL_MAX = 0.9;
+    public static final double ROLL_MIN = 0.15;
     public static final double ROLL_INC = 0.03;
 
     // -------DRIVE--------
