@@ -198,7 +198,9 @@ public class MecanumDrive {
         } else if(telemetry != null)
             telemetry.addData("Mode", "Robot Centric");
 
-        isGyroLocked = turn <= Constants.INPUT_THRESHOLD && Math.hypot(forward, strafe) <= Constants.INPUT_THRESHOLD;
+        // lock onto a gyro heading if not turning but is driving
+        isGyroLocked = turn <= Constants.INPUT_THRESHOLD
+                && Math.hypot(forward, strafe) >= Constants.INPUT_THRESHOLD;
         double boost = 0;
         if(isGyroLocked && !isTargetSet) {
             gyroTarget = imu.getYAngle();
@@ -230,12 +232,12 @@ public class MecanumDrive {
                         )
                 )
         );
-
         leftFrontPower /= powerScale;
         leftBackPower /= powerScale;
         rightBackPower /= powerScale;
         rightFrontPower /= powerScale;
 
+        // ?? if we clip the ranges below, why are we multiplying them here?
         leftFrontPower *= Constants.MOTOR_MAX_SPEED;
         leftBackPower *= Constants.MOTOR_MAX_SPEED;
         rightBackPower *= Constants.MOTOR_MAX_SPEED;
@@ -538,9 +540,4 @@ public class MecanumDrive {
 
         autonomouslyMove(str, targetAngle, newMovement, maxTime);
     }
-
-    public void alignToAprilTag(double str, Camera.AprilTagToAlign alignment) {
-
-    }
-
 }
