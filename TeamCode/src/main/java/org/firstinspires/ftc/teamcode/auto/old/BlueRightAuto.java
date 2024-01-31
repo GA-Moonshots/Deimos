@@ -2,12 +2,14 @@ package org.firstinspires.ftc.teamcode.auto.old;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Blue - RIGHT")
+@Disabled
 public class BlueRightAuto extends LinearOpMode {
     // SUBSYSTEMS
     private MecanumDrive drive;

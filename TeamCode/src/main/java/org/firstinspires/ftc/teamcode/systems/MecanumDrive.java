@@ -504,11 +504,11 @@ public class MecanumDrive {
 
         // turn to prop based on prev
         if(isLeft) {
-            autonomouslyMove(str, 90, HowToMove.ROTATE_LEFT, 5);
+            autonomouslyMove(str, 90, HowToMove.ROTATE_LEFT, 2);
             autonomouslyDriveByTime(0.0, -0.1, 0.0, 0.2);
             return Camera.AprilTagToAlign.LEFT;
         } else if(isRight) {
-            autonomouslyMove(str, -90, HowToMove.ROTATE_RIGHT, 5);
+            autonomouslyMove(str, -90, HowToMove.ROTATE_RIGHT, 2);
             autonomouslyDriveByTime(0.0, 0.1, 0.0, 0.2);
             return Camera.AprilTagToAlign.RIGHT;
         } else {

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.checkerframework.checker.units.qual.A;
@@ -13,7 +14,7 @@ import java.lang.annotation.Target;
 import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "AprilTagAuto")
-
+@Disabled
 public class AprilTagAuto extends LinearOpMode {
 
     private MecanumDrive drive;

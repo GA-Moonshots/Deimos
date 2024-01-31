@@ -161,6 +161,11 @@ public class Arm {
         open();
         return false;
     }
+
+    /**
+     * periodic command to move arm into drop-off position
+     * @return true if needs to continue?
+     */
     public boolean goToDropOff() {
         close();
         if(motor.getCurrentPosition() + offset >= Constants.ARM_UP_POSITION) {
@@ -202,6 +207,10 @@ public class Arm {
     public void open() {
         leftOpenServo.setPosition(Constants.LEFT_CLAW_OPEN_POS);
         rightOpenServo.setPosition(Constants.RIGHT_CLAW_OPEN_POS);
+        isOpen = true;
+    }
+    public void openLeft() {
+        leftOpenServo.setPosition(Constants.LEFT_CLAW_OPEN_POS);
         isOpen = true;
     }
     public void close() {

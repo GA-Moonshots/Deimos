@@ -38,6 +38,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import java.math.BigDecimal;
+
 public class DistanceSensor {
     public Rev2mDistanceSensor distanceSensor;
     private LinearOpMode opMode;
@@ -55,7 +57,8 @@ public class DistanceSensor {
      * @return distance in inches
      */
     public double getDistance() {
-        return getDistance(DistanceUnit.INCH);
+        return new BigDecimal(getDistance(DistanceUnit.INCH))
+                .setScale(2, BigDecimal.ROUND_HALF_EVEN).doubleValue();
     }
 
     /**
