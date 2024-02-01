@@ -16,8 +16,8 @@ public class Constants {
     public static final double WRIST_MAX = 1;
     public static final double WRIST_ON_GROUND = 0.44;
     public static final double WRIST_MIN = 0.15;
-    public static final double ROLL_MAX = 0.9;
-    public static final double ROLL_MIN = 0.15;
+    public static final double ROLL_FLIPPED = 0.9;
+    public static final double ROLL_UP = 0.15;
     public static final double ROLL_INC = 0.03;
 
     // -------DRIVE--------

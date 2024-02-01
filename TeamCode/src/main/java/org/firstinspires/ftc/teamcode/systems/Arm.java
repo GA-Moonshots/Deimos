@@ -89,7 +89,7 @@ public class Arm {
 
     // STATE VARIABLES
     private double wristAng = Constants.WRIST_MIN;
-    private double rollPos = Constants.ROLL_MAX;
+    private double rollPos = Constants.ROLL_FLIPPED;
     private boolean isOpen = false;
     private int offset = 0;
     public enum RunState {
@@ -119,7 +119,7 @@ public class Arm {
             rollServo.setPosition(rollPos);
         }
         else{
-            rollPos = Constants.ROLL_MIN;
+            rollPos = Constants.ROLL_UP;
             wristAng = Constants.WRIST_ON_GROUND;
 
         }
@@ -153,8 +153,8 @@ public class Arm {
         // -1400 + x >= -400
         // offset corrects encoder "walk"
         if(motor.getCurrentPosition() + offset >= -750){
-            rollServo.setPosition(Constants.ROLL_MIN);
-            rollPos = Constants.ROLL_MIN;
+            rollServo.setPosition(Constants.ROLL_UP);
+            rollPos = Constants.ROLL_UP;
             wristServo.setPosition(Constants.WRIST_ON_GROUND);
             wristAng = Constants.WRIST_ON_GROUND;
         }
@@ -173,8 +173,8 @@ public class Arm {
         } else return true;
         // Encoder values go down as arm goes up
         if(motor.getCurrentPosition() + offset <= -400){
-            rollServo.setPosition(Constants.ROLL_MAX);
-            rollPos = Constants.ROLL_MAX;
+            rollServo.setPosition(Constants.ROLL_FLIPPED);
+            rollPos = Constants.ROLL_FLIPPED;
             wristServo.setPosition(Constants.WRIST_ON_WALL);
             wristAng = Constants.WRIST_ON_WALL;
         }
@@ -228,26 +228,30 @@ public class Arm {
 
     public void rollPositive() {
         rollPos +=  Constants.ROLL_INC;
-        if(rollPos > Constants.ROLL_MAX)
-            rollPos = Constants.ROLL_MAX;
+        if(rollPos > Constants.ROLL_FLIPPED)
+            rollPos = Constants.ROLL_FLIPPED;
 
         rollServo.setPosition(rollPos);
     }
     public void rollNegative() {
         rollPos -=  Constants.ROLL_INC;
-        if(rollPos < Constants.ROLL_MIN)
-            rollPos = Constants.ROLL_MIN;
+        if(rollPos < Constants.ROLL_UP)
+            rollPos = Constants.ROLL_UP;
 
         rollServo.setPosition(rollPos);
     }
     public void toggleRoll() {
         if(rollServo.getPosition() >= .5){
-            rollServo.setPosition(Constants.ROLL_MIN);
-            rollPos = Constants.ROLL_MIN;
+            rollServo.setPosition(Constants.ROLL_UP);
+            rollPos = Constants.ROLL_UP;
         } else{
-            rollServo.setPosition(Constants.ROLL_MAX);
-            rollPos = Constants.ROLL_MAX;
+            rollServo.setPosition(Constants.ROLL_FLIPPED);
+            rollPos = Constants.ROLL_FLIPPED;
         }
+    }
+    public void rollTo(double pos) {
+        rollPos = Range.clip(pos, Constants.ROLL_UP, Constants.ROLL_FLIPPED);
+        rollServo.setPosition(rollPos);
     }
 
     @NonNull

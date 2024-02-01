@@ -408,7 +408,11 @@ public class MecanumDrive {
      */
     protected boolean maintainTurn(double strength, double target) {
         // Wrap target
-        target %= 180;
+        if(target <= -180) {
+            target += 360;
+        } else if(target >= 180) {
+            target -= 360;
+        }
 
         if(Math.abs(imu.getZAngle() - target) <= Constants.ANGLE_THRESHOLD) {
             stop();

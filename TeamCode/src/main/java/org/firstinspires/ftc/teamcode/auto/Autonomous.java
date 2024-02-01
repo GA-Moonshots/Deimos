@@ -1,12 +1,17 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.sensors.Camera;
 import org.firstinspires.ftc.teamcode.systems.Arm;
 import org.firstinspires.ftc.teamcode.systems.MecanumDrive;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.List;
 
@@ -25,8 +30,13 @@ public class Autonomous extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new MecanumDrive(this);
         arm = new Arm(this);
+
+        int cameraID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        OpenCvWebcam camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraID);
+        FtcDashboard.getInstance().startCameraStream(camera, 30);
 
         // query user about starting point and scoring agenda
         while(opModeInInit()) {
@@ -48,27 +58,32 @@ public class Autonomous extends LinearOpMode {
             // SHOW SELECTION
             telemetry.addData("Position", "%s Team, %s Side", isRed ? "Red" : "Blue", isLeft ? "Left" : "Right");
             telemetry.addData("Target Points", "%s", goForBoard ? "45" : "25");
+            telemetry.addData("Info", isRed != isLeft);
             drive.postDistanceReadouts();
             telemetry.update();
         }
 
         drive.makeFieldCentric();
         // lower claw, prepare to drop
-        arm.wristTo((Constants.WRIST_ON_GROUND + Constants.WRIST_MIN) / 2);
+        arm.wristTo(0.3);
 
         // approach the prop
         drive.gotoBackDistance(0.15, 25, 4);
-        arm.toggleRoll();
+        arm.rollTo(Constants.ROLL_UP);
         align = drive.faceTheProp(0.3, 2);
         arm.wristTo(Constants.WRIST_ON_GROUND);
+        drive.makeRobotCentric();
+        if(align != Camera.AprilTagToAlign.CENTER)
+            drive.autonomouslyDriveByTime(-0.1, 0.0, 0.0, 1);
         stop();
         // drop left pixel
         arm.openLeft();
-        sleep(100);
+        sleep(250);
         // lift claw to get out of the way
         arm.travelMode();
-        // avoid dropping our second pixel
-        arm.close();
+        if(align != Camera.AprilTagToAlign.CENTER)
+            drive.autonomouslyDriveByTime(0.1, 0.0, 0.0, 1);
+        drive.makeFieldCentric();
 
         // approach the parking area and board
         if((isLeft && !isRed) || (!isLeft && isRed)) {
@@ -102,20 +117,34 @@ public class Autonomous extends LinearOpMode {
         // straighten out
         drive.goToZeroAngle();
         // back up to starting wall
-        drive.gotoBackDistance(.6,10,1.5);
-        // go along the far wall
-        MecanumDrive.HowToMove move = isRed? MecanumDrive.HowToMove.LEFT
-                : MecanumDrive.HowToMove.RIGHT;
-        drive.autonomouslyMove(.6, 8, move, 1);
-        // move away from starting wall, ready to strafe under the flappy bar
-        drive.autonomouslyDriveByTime(-.7,0,0,2.5);
+        drive.gotoBackDistance(.4,10,3);
+        drive.goToZeroAngle();
+        if(align != Camera.AprilTagToAlign.CENTER) {
+            drive.autonomouslyDriveByTime(-0.5, 0.0, 0.0, 3);
+        } else {
+            double targetDistance;
+            if(isRed) {
+                targetDistance = drive.leftDistance.doubleCheckDistance();
+                drive.gotoLeftDistance(10);
+            } else {
+                targetDistance = drive.rightDistance.doubleCheckDistance();
+                drive.gotoRightDistance(10);
+            }
 
-        // drive across the field
-        double strafe = isRed? .7 : -.7;
-        drive.autonomouslyDriveByTime(0,strafe,0,3.5); // move past the prop
-        move = isRed ? MecanumDrive.HowToMove.RIGHT : MecanumDrive.HowToMove.LEFT;
+            drive.autonomouslyDriveByTime(-0.3, 0.0, 0.0, 5);
+
+            if(isRed) {
+                drive.gotoLeftDistance(targetDistance);
+                drive.autonomouslyDriveByTime(0, 0.6, 0, 1);
+            } else {
+                drive.gotoRightDistance(targetDistance);
+                drive.autonomouslyDriveByTime(0, -0.6, 0, 1);
+            }
+        }
+
+        drive.autonomouslyDriveByTime(0,isRed ? 0.6 : -0.6,0,3); // move past the prop
+        MecanumDrive.HowToMove move = isRed ? MecanumDrive.HowToMove.RIGHT : MecanumDrive.HowToMove.LEFT;
         drive.autonomouslyMove(.7, 24, move, 4);
-
     }
 
     public void parkInside() {
@@ -124,6 +153,8 @@ public class Autonomous extends LinearOpMode {
                 //boolean statement ? if true : if false
                 isRed ? MecanumDrive.HowToMove.RIGHT : MecanumDrive.HowToMove.LEFT,
                 4.75);
+        arm.wristTo(Constants.WRIST_ON_GROUND);
+        sleep(500);
     }
 
     public void parkOutside() {
@@ -134,7 +165,9 @@ public class Autonomous extends LinearOpMode {
             drive.gotoRightDistance(4);
         else
             drive.gotoLeftDistance(4);
-        drive.autonomouslyDriveByTime(0.1, 0.0, 0.0, 1);
+        drive.autonomouslyDriveByTime(0.1, 0.0, 0.0, 3);
+        arm.wristTo(Constants.WRIST_ON_GROUND);
+        sleep(500);
     }
 
     public void goForBoard() {
@@ -179,29 +212,42 @@ public class Autonomous extends LinearOpMode {
         }
 
         // if inside, move out of the way, if outside, the time is too close
+        if(isRed != isLeft) {
+            // stuff
+        }
     }
 
     public void approachTag(){
-        AprilTagDetection target = fetchTarget();
+
         // TODO: Handle case if no tag is detected because just giving up is bad
-        if (target == null) terminateOpModeNow();
         while(opModeIsActive()){
-            // fix our delta x value for alignment
-            if(Math.abs(target.ftcPose.x) > Constants.DISTANCE_THRESHOLD) {
-                drive.autonomouslyDriveByTime(0.0, -target.ftcPose.x / 40, 0.0, 1);
-                drive.goToZeroAngle();
+            AprilTagDetection target = fetchTarget();
+
+            if (target == null)
+                drive.drive(-0.1, 0.0, 0.0);
+            else {
+                // fix our delta x value for alignment
+                if(Math.abs(target.ftcPose.x) > Constants.DISTANCE_THRESHOLD) {
+                    drive.autonomouslyDriveByTime(0.0, -target.ftcPose.x / 20, 0.0, 0.5);
+                    //drive.gotoAngle(isRed ? 90 : -90);
+
+                }
             }
+            telemetry.update();
         }
-        drive.gotoBackDistance(10, 2);
+        drive.gotoBackDistance(4, 2);
+        drive.gotoAngle(isRed ? 90 : -90);
+
+
     }
 
     public AprilTagDetection fetchTarget() {
         detections = drive.camera.getDetections();
 
-        for(AprilTagDetection april : detections){
+        for(AprilTagDetection april : detections)
             if(april.metadata.name.toLowerCase().indexOf(align.name().toLowerCase()) != -1)
                 return april;
-        }
+
         return null;
 
     }
