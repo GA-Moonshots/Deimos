@@ -52,8 +52,17 @@ public class TestMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        drive = new MecanumDrive(this);
         // Switch this to the test that we want
-        elevatorTest();
+        imuTest();
+    }
+
+    public void imuTest() {
+        while(opModeInInit()) {
+            telemetry.addData("imu", drive.imu.getZAngle());
+            telemetry.update();
+        }
     }
 
     public void driveTest() {

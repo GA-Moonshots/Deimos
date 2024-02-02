@@ -21,6 +21,7 @@ public class Autonomous extends LinearOpMode {
     private boolean isRed = false;
     private boolean goForBoard = false;
     private boolean gotoOpposite = false;
+    private boolean isNear;
 
     private MecanumDrive drive;
     private Arm arm;
@@ -33,6 +34,7 @@ public class Autonomous extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new MecanumDrive(this);
         arm = new Arm(this);
+
 
         int cameraID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         OpenCvWebcam camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraID);
@@ -58,10 +60,10 @@ public class Autonomous extends LinearOpMode {
             // SHOW SELECTION
             telemetry.addData("Position", "%s Team, %s Side", isRed ? "Red" : "Blue", isLeft ? "Left" : "Right");
             telemetry.addData("Target Points", "%s", goForBoard ? "45" : "25");
-            telemetry.addData("Info", isRed != isLeft);
             drive.postDistanceReadouts();
             telemetry.update();
         }
+        isNear = isRed != isLeft;
 
         drive.makeFieldCentric();
         // lower claw, prepare to drop
@@ -74,7 +76,7 @@ public class Autonomous extends LinearOpMode {
         arm.wristTo(Constants.WRIST_ON_GROUND);
         drive.makeRobotCentric();
         if(align != Camera.AprilTagToAlign.CENTER)
-            drive.autonomouslyDriveByTime(-0.1, 0.0, 0.0, 1);
+            drive.autonomouslyDriveByTime(-0.2, 0.0, 0.0, 0.5);
         stop();
         // drop left pixel
         arm.openLeft();
@@ -82,11 +84,11 @@ public class Autonomous extends LinearOpMode {
         // lift claw to get out of the way
         arm.travelMode();
         if(align != Camera.AprilTagToAlign.CENTER)
-            drive.autonomouslyDriveByTime(0.1, 0.0, 0.0, 1);
+            drive.autonomouslyDriveByTime(0.2, 0.0, 0.0, 0.5);
         drive.makeFieldCentric();
 
         // approach the parking area and board
-        if((isLeft && !isRed) || (!isLeft && isRed)) {
+        if(isNear) {
             near();
         } else {
             far();
@@ -94,7 +96,7 @@ public class Autonomous extends LinearOpMode {
 
         // go for the extra 20 points or just park?
         if(goForBoard) goForBoard();
-        else if((isLeft && !isRed) || (!isLeft && isRed))
+        else if(isNear)
             parkInside();
          else parkOutside();
     }
@@ -102,7 +104,7 @@ public class Autonomous extends LinearOpMode {
     public void near() {
         // This needs to be in field centric mode since it is going to go backwards regardless of what
         // position the robot goes to in the faceTheProp method.
-        drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 2);
+        drive.autonomouslyDriveByTime(0.6, 0.0, 0.0, 1);
 
         // straighten out
         drive.goToZeroAngle();
@@ -113,7 +115,7 @@ public class Autonomous extends LinearOpMode {
 
     public void far() {
         // scoot back
-        drive.autonomouslyDriveByTime(0.3, 0.0, 0.0, 1);
+        drive.autonomouslyDriveByTime(0.6, 0.0, 0.0, 0.5);
         // straighten out
         drive.goToZeroAngle();
         // back up to starting wall
@@ -172,21 +174,16 @@ public class Autonomous extends LinearOpMode {
 
     public void goForBoard() {
         // approach board after running near()
-        if((isLeft && !isRed) || (!isLeft && isRed)){
+        if(isNear){
             if(isRed)
-                drive.gotoRightDistance(24);
+                drive.gotoRightDistance(0.5, 30, 4);
             else
-                drive.gotoLeftDistance(24);
+                drive.gotoLeftDistance(0.5, 30, 4);
             drive.gotoBackDistance(0.12, 25, 4);
-
-            // face the board
-            MecanumDrive.HowToMove move = isRed ? MecanumDrive.HowToMove.ROTATE_LEFT
-                    : MecanumDrive.HowToMove.ROTATE_RIGHT;
-            drive.autonomouslyMove(.4, 90, move, 1.5);
         }
         // approach board after crossing the field
         else {
-            drive.gotoAngle(90);
+            //drive.gotoAngle(90, 5);
             drive.makeRobotCentric();
             if(isRed)
                 drive.gotoLeftDistance(0.5, 25, 1);
@@ -195,16 +192,16 @@ public class Autonomous extends LinearOpMode {
             drive.makeFieldCentric();
         }
 
-        // get arm ready to release pixel
-        while(opModeIsActive() && !arm.goToDropOff()) {
-            telemetry.update();
-        }
+        drive.gotoAngle(1, isRed ? 90 : -90, 2);
 
+        drive.makeFieldCentric();
         // inch up to board to prepare to drop
         approachTag();
 
         // place pixel
         arm.open();
+
+        sleep(100);
 
         // drop arm
         while(opModeIsActive() && !arm.goToPickUp()) {
@@ -212,43 +209,65 @@ public class Autonomous extends LinearOpMode {
         }
 
         // if inside, move out of the way, if outside, the time is too close
-        if(isRed != isLeft) {
-            // stuff
+        if(isNear) {
+            drive.makeRobotCentric();
+            drive.gotoBackDistance(7);
+            drive.makeFieldCentric();
+            drive.goToZeroAngle();
+            drive.gotoBackDistance(5);
+            parkInside();
         }
     }
 
     public void approachTag(){
-
-        // TODO: Handle case if no tag is detected because just giving up is bad
+        // TODO: Currently this is an infinite loop, make a break case
         while(opModeIsActive()){
+            arm.goToDropOff();
             AprilTagDetection target = fetchTarget();
 
-            if (target == null)
+            if (target == null) {
                 drive.drive(-0.1, 0.0, 0.0);
-            else {
+                sleep(30);
+            } else {
                 // fix our delta x value for alignment
                 if(Math.abs(target.ftcPose.x) > Constants.DISTANCE_THRESHOLD) {
-                    drive.autonomouslyDriveByTime(0.0, -target.ftcPose.x / 20, 0.0, 0.5);
-                    //drive.gotoAngle(isRed ? 90 : -90);
-
+                    drive.drive(-target.ftcPose.x / 10, 0.0, 0.0);
+                } else {
+                    stop();
+                    break;
                 }
+                updateTargetTelemetry(target);
             }
-            telemetry.update();
         }
-        drive.gotoBackDistance(4, 2);
-        drive.gotoAngle(isRed ? 90 : -90);
 
+        while(opModeIsActive() && !arm.goToDropOff()) {
+            stop();
+        }
 
+        drive.gotoAngle(isRed ? 90 : -90, 4);
+
+        drive.makeRobotCentric();
+        drive.gotoBackDistance(2, 2);
     }
 
     public AprilTagDetection fetchTarget() {
         detections = drive.camera.getDetections();
 
         for(AprilTagDetection april : detections)
-            if(april.metadata.name.toLowerCase().indexOf(align.name().toLowerCase()) != -1)
+            if(april.metadata.name.toLowerCase().contains(align.name().toLowerCase()))
                 return april;
 
         return null;
 
     }
+    public void updateTargetTelemetry(AprilTagDetection target) {
+        telemetry.addData("target x", target.ftcPose.x);
+        telemetry.addData("target y", target.ftcPose.y);
+        telemetry.addData("target range", target.ftcPose.range);
+        telemetry.addData("# of detects", detections.size());
+        telemetry.update();
+        sleep(2);
+
+    }
+
 }

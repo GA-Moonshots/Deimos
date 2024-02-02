@@ -86,6 +86,8 @@ import org.firstinspires.ftc.teamcode.sensors.IMU;
 import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
 import org.firstinspires.ftc.teamcode.sensors.Camera;
 
+import java.lang.annotation.Target;
+
 public class MecanumDrive {
     // USEFUL ENUMS
 
@@ -321,11 +323,6 @@ public class MecanumDrive {
                     }
                     break;
                 case ROTATE_LEFT:
-                    if(maintainTurn(-strength, target)) {
-                        stop();
-                        return;
-                    }
-                    break;
                 case ROTATE_RIGHT:
                     if(maintainTurn(strength, target)) {
                         stop();
@@ -418,8 +415,9 @@ public class MecanumDrive {
             stop();
             return true;
         }
-
-        drive(0.0d, 0.0d, strength);
+        telemetry.addData("Diff", imu.getZAngle() - target);
+        telemetry.update();
+        drive(0.0d, 0.0d, strength * Math.toRadians(imu.getZAngle() - target));
         return false;
     }
 
@@ -465,6 +463,13 @@ public class MecanumDrive {
 
     public void gotoAngle(double target, HowToMove move, double maxTime) {
         autonomouslyMove(0.3, target, move, maxTime);
+    }
+
+    public void gotoAngle(double strength, double target, double maxTime) {
+        if(imu.getZAngle() - target > 0)
+            autonomouslyMove(strength, target, HowToMove.ROTATE_LEFT, maxTime);
+        else
+            autonomouslyMove(strength, target, HowToMove.ROTATE_RIGHT, maxTime);
     }
 
     public void gotoAngle(double target, HowToMove move) {

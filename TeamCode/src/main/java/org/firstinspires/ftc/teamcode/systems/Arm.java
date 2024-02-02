@@ -112,17 +112,15 @@ public class Arm {
         rollServo = opMode.hardwareMap.get(Servo.class, Constants.ROLL_SERVO_NAME);
 
 
-        if(opMode instanceof Autonomous) {
-            wristServo.setPosition(wristAng);
-            leftOpenServo.setPosition(Constants.LEFT_CLAW_CLOSED_POS);
-            rightOpenServo.setPosition(Constants.RIGHT_CLAW_CLOSED_POS);
-            rollServo.setPosition(rollPos);
-        }
-        else{
+        // Change the initialization pos if we're not in autonomous
+        if (!(opMode instanceof Autonomous)) {
             rollPos = Constants.ROLL_UP;
             wristAng = Constants.WRIST_ON_GROUND;
-
         }
+        wristServo.setPosition(wristAng);
+        rollServo.setPosition(rollPos);
+        leftOpenServo.setPosition(Constants.LEFT_CLAW_CLOSED_POS);
+        rightOpenServo.setPosition(Constants.RIGHT_CLAW_CLOSED_POS);
     }
 
     public void move(double shoulderRot){
@@ -144,6 +142,7 @@ public class Arm {
     }
     public boolean goToPickUp() {
         // Make these internal state loops?
+        // We can't. These need to be non-blocking since they are used in teleop.
 
         // ongoing motion check... should it continue moving?
         if(motor.getCurrentPosition() + offset <= Constants.ARM_DOWN_POSITION)
@@ -172,11 +171,11 @@ public class Arm {
             motor.setPower(-Constants.ARM_MOTOR_STRENGTH_UP);
         } else return true;
         // Encoder values go down as arm goes up
-        if(motor.getCurrentPosition() + offset <= -400){
-            rollServo.setPosition(Constants.ROLL_FLIPPED);
-            rollPos = Constants.ROLL_FLIPPED;
-            wristServo.setPosition(Constants.WRIST_ON_WALL);
+        if(motor.getCurrentPosition() + offset <= -200){
             wristAng = Constants.WRIST_ON_WALL;
+            rollPos = Constants.ROLL_FLIPPED;
+            rollServo.setPosition(rollPos);
+            wristServo.setPosition(wristAng);
         }
         return false;
     }
