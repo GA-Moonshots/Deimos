@@ -79,14 +79,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.sensors.IMU;
 import org.firstinspires.ftc.teamcode.sensors.DistanceSensor;
 import org.firstinspires.ftc.teamcode.sensors.Camera;
-
-import java.lang.annotation.Target;
 
 public class MecanumDrive {
     // USEFUL ENUMS
@@ -96,8 +93,7 @@ public class MecanumDrive {
         LEFT,
         RIGHT,
         BACK,
-        ROTATE_LEFT,
-        ROTATE_RIGHT
+        ROTATE,
     }
 
     // MOTORS
@@ -120,7 +116,7 @@ public class MecanumDrive {
     private double runawayRobotShield = -1;
     private double lastAprilTagYaw = 0.0d;
     private double lastAprilTagStrafe = 0.0d;
-    private double fieldCentricTarget = 0.0d;
+    public double fieldCentricTarget = 0.0d;
     private boolean isFieldCentric = true;
     private boolean isGyroLocked = false;
     private boolean isTargetSet = false;
@@ -322,8 +318,7 @@ public class MecanumDrive {
                         return;
                     }
                     break;
-                case ROTATE_LEFT:
-                case ROTATE_RIGHT:
+                case ROTATE:
                     if(maintainTurn(strength, target)) {
                         stop();
                         return;
@@ -467,9 +462,9 @@ public class MecanumDrive {
 
     public void gotoAngle(double strength, double target, double maxTime) {
         if(imu.getZAngle() - target > 0)
-            autonomouslyMove(strength, target, HowToMove.ROTATE_LEFT, maxTime);
+            autonomouslyMove(strength, target, HowToMove.ROTATE, maxTime);
         else
-            autonomouslyMove(strength, target, HowToMove.ROTATE_RIGHT, maxTime);
+            autonomouslyMove(strength, target, HowToMove.ROTATE, maxTime);
     }
 
     public void gotoAngle(double target, HowToMove move) {
@@ -478,9 +473,9 @@ public class MecanumDrive {
 
     public void gotoAngle(double target, double maxTime) {
         if(imu.getZAngle() - target > 0)
-            gotoAngle(target, HowToMove.ROTATE_LEFT, maxTime);
+            gotoAngle(target, HowToMove.ROTATE, maxTime);
         else
-            gotoAngle(target, HowToMove.ROTATE_RIGHT, maxTime);
+            gotoAngle(target, HowToMove.ROTATE, maxTime);
     }
 
     public void gotoAngle(double target) {
@@ -513,11 +508,11 @@ public class MecanumDrive {
 
         // turn to prop based on prev
         if(isLeft) {
-            autonomouslyMove(str, 90, HowToMove.ROTATE_LEFT, 2);
+            autonomouslyMove(str, 90, HowToMove.ROTATE, 2);
             autonomouslyDriveByTime(0.0, -0.1, 0.0, 0.2);
             return Camera.AprilTagToAlign.LEFT;
         } else if(isRight) {
-            autonomouslyMove(str, -90, HowToMove.ROTATE_RIGHT, 2);
+            autonomouslyMove(str, -90, HowToMove.ROTATE, 2);
             autonomouslyDriveByTime(0.0, 0.1, 0.0, 0.2);
             return Camera.AprilTagToAlign.RIGHT;
         } else {
@@ -528,7 +523,7 @@ public class MecanumDrive {
 
     public void circleScanForProp(double str, HowToMove movement, double maxTime) {
         // Set the power value to the correct mode
-        double realStr = movement == HowToMove.ROTATE_LEFT ? -str : str;
+        double realStr = movement == HowToMove.ROTATE ? -str : str;
         // Add timing? May not be required for this function
         ElapsedTime rt = new ElapsedTime();
         while(rearDistance.getDistance() >= 8 && opMode.opModeIsActive() && rt.seconds() <= maxTime) {
@@ -552,7 +547,7 @@ public class MecanumDrive {
         }
 
         // Rotate the opposite way
-        HowToMove newMovement = (movement == HowToMove.ROTATE_LEFT) ? HowToMove.ROTATE_LEFT : HowToMove.ROTATE_RIGHT;
+        HowToMove newMovement = (movement == HowToMove.ROTATE) ? HowToMove.ROTATE : HowToMove.ROTATE;
 
         autonomouslyMove(str, targetAngle, newMovement, maxTime);
     }

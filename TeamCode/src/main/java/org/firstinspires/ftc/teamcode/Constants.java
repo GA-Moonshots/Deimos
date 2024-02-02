@@ -3,10 +3,10 @@ package org.firstinspires.ftc.teamcode;
 public class Constants {
     // ----ARM VARIABLES----
     // ----ARM VARIABLES----
-    public static final int ARM_UP_POSITION = -900;
+    public static final int ARM_UP_POSITION = -700;
     public static final int ARM_DOWN_POSITION = 0;
     public static final double ARM_MOTOR_STRENGTH_UP = 0.9;
-    public static final double ARM_MOTOR_STRENGTH_DOWN = 0.5;
+    public static final double ARM_MOTOR_STRENGTH_DOWN = 0.7;
     public static final double WRIST_ON_WALL =  0.7;
     public static final double LEFT_CLAW_OPEN_POS = 0.5;
     public static final double LEFT_CLAW_CLOSED_POS = 0.7;
@@ -36,7 +36,7 @@ public class Constants {
     // Generalized minimum angle difference for the robot to respond to an autonomous movement command
     public static final double ANGLE_THRESHOLD = 3.0;
     // Generalized minimum position difference for the robot to respond to an autonomous movement command
-    public static final double DISTANCE_THRESHOLD = 0.5;
+    public static final double DISTANCE_THRESHOLD = 1;
 
     public static final double KP = 0.2;
 

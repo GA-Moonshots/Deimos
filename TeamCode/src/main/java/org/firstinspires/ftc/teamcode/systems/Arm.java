@@ -112,15 +112,21 @@ public class Arm {
         rollServo = opMode.hardwareMap.get(Servo.class, Constants.ROLL_SERVO_NAME);
 
 
+        leftOpenServo.setPosition(Constants.LEFT_CLAW_CLOSED_POS);
+        rightOpenServo.setPosition(Constants.RIGHT_CLAW_CLOSED_POS);
+        opMode.sleep(1500);
         // Change the initialization pos if we're not in autonomous
         if (!(opMode instanceof Autonomous)) {
             rollPos = Constants.ROLL_UP;
             wristAng = Constants.WRIST_ON_GROUND;
+        } else {
+            wristServo.setPosition(0.3);
+            opMode.sleep(1500);
+            rollServo.setPosition(rollPos);
+            opMode.sleep(1500);
         }
         wristServo.setPosition(wristAng);
         rollServo.setPosition(rollPos);
-        leftOpenServo.setPosition(Constants.LEFT_CLAW_CLOSED_POS);
-        rightOpenServo.setPosition(Constants.RIGHT_CLAW_CLOSED_POS);
     }
 
     public void move(double shoulderRot){
@@ -151,7 +157,7 @@ public class Arm {
         // Encoder values go down as arm goes up
         // -1400 + x >= -400
         // offset corrects encoder "walk"
-        if(motor.getCurrentPosition() + offset >= -750){
+        if(motor.getCurrentPosition() + offset >= -400){
             rollServo.setPosition(Constants.ROLL_UP);
             rollPos = Constants.ROLL_UP;
             wristServo.setPosition(Constants.WRIST_ON_GROUND);
@@ -166,6 +172,7 @@ public class Arm {
      * @return true if needs to continue?
      */
     public boolean goToDropOff() {
+        opMode.telemetry.addData("ARM", motor.getCurrentPosition());
         close();
         if(motor.getCurrentPosition() + offset >= Constants.ARM_UP_POSITION) {
             motor.setPower(-Constants.ARM_MOTOR_STRENGTH_UP);
